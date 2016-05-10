@@ -64,30 +64,6 @@ public class SimplexUniverse : MonoBehaviour
 
     void Start()
     {
-        Vector3i vp = new Vector3i(0, 1, 2);
-        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
-
-        vp = new Vector3i(3, 1, 2);
-        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
-
-        vp = new Vector3i(1, 2, 0);
-        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
-
-        vp = new Vector3i(6, -2, -1);
-        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
-
-        vp = new Vector3i(-1, -2, -1);
-        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
-
-        vp = new Vector3i(0, 0, 4);
-        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
-
-        vp = new Vector3i(-3, -3, 3);
-        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
-
-        vp = new Vector3i(-3, -4, 3);
-        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
-
         CreateAllSectors();
 
         GeneratePhysical();
@@ -108,9 +84,6 @@ public class SimplexUniverse : MonoBehaviour
     {
         public Vector3i coordinate;
         public Vector3i localCoordinate;
-        //public int x;
-        //public int y;
-        //public int z;
 
         public bool hasSystem;
 
@@ -127,6 +100,7 @@ public class SimplexUniverse : MonoBehaviour
         public Color[] planetColors;
 
         public StarEntity[] star;
+        public StarEntity[] newStar;
 
         public bool IsOutOfBounds(int boundsSize)
         {
@@ -174,7 +148,7 @@ public class SimplexUniverse : MonoBehaviour
             {
                 for (int z = 0; z < sectorRange; z++)
                 {
-                    sectors[x, y, z] = CreateSector(curSectorX + x, curSectorY + y, curSectorZ + z);
+                    sectors[x, y, z] = CreateNewSector(curSectorX + x, curSectorY + y, curSectorZ + z);
 
                 }
             }
@@ -187,10 +161,14 @@ public class SimplexUniverse : MonoBehaviour
         curSectorY += byY;
         curSectorZ += byZ;
 
+        SmartMovePhysical(byX, byY, byZ);
+
+        /*
         ClearAllSectors();
         CreateAllSectors();
 
         GeneratePhysical();
+        */
 
         //StartCoroutine(SkipFrame());
     }
@@ -210,19 +188,52 @@ public class SimplexUniverse : MonoBehaviour
     {
         Vector3i by = new Vector3i(byX, byY, byZ);
 
-        bool[,,] regenSectors = new bool[sectorRange, sectorRange, sectorRange];
+        //bool[,,] regenSectors = new bool[sectorRange, sectorRange, sectorRange];
         // move entire universe to new sectors
-        Sector[,,] tempSectors = sectors;
+        //Sector[,,] tempSectors = sectors.Clone() as Sector[,,];
 
-
-        // reassign sector coordinates
+        // PASS 1 - rearrange and clean
         foreach (var sector in sectors)
         {
-
-            //sector.coordinate -= by;
-            //if ()
+            if (CoordinateIsInsideBounds(sector.coordinate + by))
+            {
+                // if future sector is also inside bounds, assign the star from this sector to a temporary one
+                GetSectorAtLocal(sector.coordinate + by).newStar = sector.star;
+            }
+            else
+            {
+                // else destroy the star system..
+                DestroySystem(sector.star);
+            }
         }
 
+        // PASS 2 - construct
+        foreach (var sector in sectors)
+        {
+            // now set new coordinates
+            sector.coordinate = sector.coordinate + by;
+
+            // now overwrite stars
+            if (sector.newStar != null)
+            {
+                sector.star = sector.newStar;
+
+                // and move them
+
+            }
+
+            // and regenerate sector
+            CreateSector(sector);
+
+            // if sector has no physical star, create new one
+            if (sector.star == null)
+                GeneratePhysical(sector);
+        }
+
+        // then recreate all sectors
+        //CreateAllSectors();
+
+        /*
         // detect if some sectors did not leave 
 
         // recreate sectors with new coordinates
@@ -253,7 +264,18 @@ public class SimplexUniverse : MonoBehaviour
         {
         }
 
+    */
+    }
 
+    void RegenerateSector(Sector s)
+    {
+
+    }
+
+    Sector GetSectorAtLocal(Vector3i coord)
+    {
+        Vector3i localCoord = coord - GetCurSector();
+        return sectors[localCoord.x, localCoord.y, localCoord.z];
     }
 
     void ClearAllPhysical()
@@ -308,41 +330,42 @@ public class SimplexUniverse : MonoBehaviour
 
         foreach (var sector in sectors)
         {
-            if (sector.hasSystem)
-            {
-                //Gizmos.color = Color.gray;
-                //Gizmos.DrawWireCube(GetSectorMidPos(sector.x, sector.y, sector.z), Vector3.one * sectorSeparation);
-                //Gizmos.color = sector.starColor * 3;
-
-                Vector3 sectorStartPos = GetSectorStartPos(sector);
-
-                GameObject starGO = Instantiate(starPrefab, sectorStartPos + sector.starPostion, Quaternion.identity) as GameObject;
-                if (Motion.e) Motion.e.chunks.Add(starGO.transform);
-                // material color?
-
-                // if not a nebula generate only one star
-                sector.star = new StarEntity[1];
-                sector.star[0] = starGO.GetComponent<StarEntity>();
-
-                if (sector.planetPositions.Length > 0)
-                {
-                    sector.star[0].planets = new PlanetEntity[sector.planetPositions.Length];
-
-                    for (int i = 0; i < sector.planetPositions.Length; i++)
-                    {
-                        GameObject planetGO = Instantiate(planetPrefab, sectorStartPos + sector.planetPositions[i], Quaternion.identity) as GameObject;
-                        if (Motion.e) Motion.e.chunks.Add(planetGO.transform);
-
-                        sector.star[0].planets[i] = planetGO.GetComponent<PlanetEntity>();
-                        if (!sector.star[0].planets[i]) Debug.LogWarning("PlanetEntity not found");
-                    }
-                }
-            }
+            GeneratePhysical(sector);
         }
 
         Debug.Log("Generate physical: " + (Time.realtimeSinceStartup - tTest)); // TEST TIMER
 
         StartCoroutine(FrameAfter());
+    }
+
+    void GeneratePhysical(Sector sector)
+    {
+        if (sector.hasSystem)
+        {
+            Vector3 sectorStartPos = GetSectorStartPos(sector);
+
+            GameObject starGO = Instantiate(starPrefab, sectorStartPos + sector.starPostion, Quaternion.identity) as GameObject;
+            if (Motion.e) Motion.e.chunks.Add(starGO.transform);
+            // material color?
+
+            // if not a nebula generate only one star
+            sector.star = new StarEntity[1];
+            sector.star[0] = starGO.GetComponent<StarEntity>();
+
+            if (sector.planetPositions.Length > 0)
+            {
+                sector.star[0].planets = new PlanetEntity[sector.planetPositions.Length];
+
+                for (int i = 0; i < sector.planetPositions.Length; i++)
+                {
+                    GameObject planetGO = Instantiate(planetPrefab, sectorStartPos + sector.planetPositions[i], Quaternion.identity) as GameObject;
+                    if (Motion.e) Motion.e.chunks.Add(planetGO.transform);
+
+                    sector.star[0].planets[i] = planetGO.GetComponent<PlanetEntity>();
+                    if (!sector.star[0].planets[i]) Debug.LogWarning("PlanetEntity not found");
+                }
+            }
+        }
     }
 
     void ClearAllSectors()
@@ -366,7 +389,7 @@ public class SimplexUniverse : MonoBehaviour
         }
     }
 
-    Sector CreateSector(int x, int y, int z)
+    Sector CreateNewSector(int x, int y, int z)
     {
         CreateSimplex();
 
@@ -374,6 +397,16 @@ public class SimplexUniverse : MonoBehaviour
 
         s.coordinate = new Vector3i(x, y, z);
 
+        CreateSector(s);
+
+        return s;
+    }
+
+    void CreateSector(Sector s)
+    {
+        int x = s.coordinate.x;
+        int y = s.coordinate.y;
+        int z = s.coordinate.z;
 
         float value = simplex.coherentNoise(x, y, z, octaves, multiplier, amplitude, lacunarity, persistence);
         value += 0.5f;
@@ -381,11 +414,11 @@ public class SimplexUniverse : MonoBehaviour
         Random.seed = ("ad" + x + "_" + y + "_" + z).GetHashCode();
 
         if (value < systemProbability) // has no solar system
-            return s;
+            return;
 
         // has a solar system:
         if (skipZero && s.coordinate == Vector3i.zero)
-            return s;
+            return;
 
         s.hasSystem = true;
 
@@ -415,8 +448,24 @@ public class SimplexUniverse : MonoBehaviour
             s.planetPositions[i] = s.starPostion + pos;
             s.planetColors[i] = planetColorGradient.Evaluate(Random.value);
         }
+    }
 
-        return s;
+    void DestroySystem(StarEntity[] stars)
+    {
+        if (stars == null) return;
+
+        foreach (var star in stars)
+        {
+            foreach (var planet in star.planets)
+            {
+                if (planet)
+                    Destroy(planet.gameObject);
+            }
+
+            Destroy(star.gameObject);
+        }
+
+        stars = null;
     }
 
     Vector3i GetCurSector()
@@ -523,7 +572,8 @@ public class SimplexUniverse : MonoBehaviour
 
                     Gizmos.DrawSphere(sectorStartPos + sector.starPostion, starPreviewRadius);
 
-                    UnityEditor.Handles.Label(sectorStartPos + sector.starPostion, sector.name);
+                    if (previewNames)
+                        UnityEditor.Handles.Label(sectorStartPos + sector.starPostion, sector.name);
 
                     if (previewPlanets && sector.planetPositions.Length > 0)
                     {
