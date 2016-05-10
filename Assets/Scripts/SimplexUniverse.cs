@@ -138,10 +138,14 @@ public class SimplexUniverse : MonoBehaviour
         CreateAllSectors();
 
         GeneratePhysical();
+
+        //StartCoroutine(SkipFrame());
     }
 
     void ClearAllPhysical()
     {
+        float tTest = Time.realtimeSinceStartup; // TEST TIMER
+
         foreach (var sector in sectors)
         {
             if (!sector.hasSystem) continue;
@@ -162,6 +166,20 @@ public class SimplexUniverse : MonoBehaviour
                 Destroy(sector.star[i].gameObject);
             }
         }
+
+        Debug.Log("Clear all physical: " + (Time.realtimeSinceStartup - tTest)); // TEST TIMER
+
+    }
+
+    IEnumerator FrameAfter()
+    {
+
+        float tTest = Time.realtimeSinceStartup; // TEST TIMER
+
+        yield return null;
+
+        Debug.Log("Next frame: " + (Time.realtimeSinceStartup - tTest)); // TEST TIMER
+
     }
 
     void GeneratePhysical()
@@ -171,6 +189,8 @@ public class SimplexUniverse : MonoBehaviour
         if (!starPrefab || !planetPrefab) return;
 
         ClearAllPhysical();
+
+        float tTest = Time.realtimeSinceStartup; // TEST TIMER
 
         foreach (var sector in sectors)
         {
@@ -205,6 +225,10 @@ public class SimplexUniverse : MonoBehaviour
                 }
             }
         }
+
+        Debug.Log("Generate physical: " + (Time.realtimeSinceStartup - tTest)); // TEST TIMER
+
+        StartCoroutine(FrameAfter());
     }
 
     void ClearAllSectors()
