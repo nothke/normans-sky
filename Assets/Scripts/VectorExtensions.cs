@@ -43,6 +43,11 @@ namespace VectorExtensions
             return new Vector3i(a.x - b.x, a.y - b.y, a.z - b.z);
         }
 
+        public static Vector3i operator -(Vector3i a)
+        {
+            return new Vector3i(-a.x, -a.y, -a.z);
+        }
+
         public static Vector3i operator *(Vector3i a, int scalar)
         {
             return new Vector3i(a.x * scalar, a.y * scalar, a.z * scalar);
@@ -61,6 +66,26 @@ namespace VectorExtensions
         public static bool operator !=(Vector3i a, Vector3i b)
         {
             return a.x == b.x && a.y == b.y && a.z == b.z ? false : true;
+        }
+
+        public static bool operator <(Vector3i a, Vector3i b)
+        {
+            return a.x < b.x && a.y < b.y && a.z < b.z;
+        }
+
+        public static bool operator >(Vector3i a, Vector3i b)
+        {
+            return a.x > b.x && a.y > b.y && a.z > b.z;
+        }
+
+        public static bool operator <=(Vector3i a, Vector3i b)
+        {
+            return a.x <= b.x && a.y <= b.y && a.z <= b.z;
+        }
+
+        public static bool operator >=(Vector3i a, Vector3i b)
+        {
+            return a.x >= b.x && a.y >= b.y && a.z >= b.z;
         }
 
         // override object.Equals

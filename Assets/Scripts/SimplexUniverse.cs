@@ -64,6 +64,30 @@ public class SimplexUniverse : MonoBehaviour
 
     void Start()
     {
+        Vector3i vp = new Vector3i(0, 1, 2);
+        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
+
+        vp = new Vector3i(3, 1, 2);
+        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
+
+        vp = new Vector3i(1, 2, 0);
+        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
+
+        vp = new Vector3i(6, -2, -1);
+        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
+
+        vp = new Vector3i(-1, -2, -1);
+        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
+
+        vp = new Vector3i(0, 0, 4);
+        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
+
+        vp = new Vector3i(-3, -3, 3);
+        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
+
+        vp = new Vector3i(-3, -4, 3);
+        Debug.Log(vp.x + "," + vp.y + "," + vp.z + " " + CoordinateIsInsideBounds(vp));
+
         CreateAllSectors();
 
         GeneratePhysical();
@@ -104,17 +128,16 @@ public class SimplexUniverse : MonoBehaviour
 
         public StarEntity[] star;
 
-        /*
-        public void AddCoord(int byX, int byY, int byZ)
-        {
-            x += byX;
-            y += byY;
-            z += byZ;
-        }*/
-
         public bool IsOutOfBounds(int boundsSize)
         {
-            return true; // INCOMPLETE
+            if (localCoordinate.x >= boundsSize) return true;
+            if (localCoordinate.y >= boundsSize) return true;
+            if (localCoordinate.z >= boundsSize) return true;
+            if (localCoordinate.x < 0) return true;
+            if (localCoordinate.y < 0) return true;
+            if (localCoordinate.z < 0) return true;
+
+            return false;
         }
 
         public void GiveStar(Sector otherSector)
@@ -135,6 +158,9 @@ public class SimplexUniverse : MonoBehaviour
     {
         return sectorRadius * 2 + 1;
     }
+
+
+
 
     void CreateAllSectors()
     {
@@ -169,18 +195,53 @@ public class SimplexUniverse : MonoBehaviour
         //StartCoroutine(SkipFrame());
     }
 
+    bool CoordinateIsInsideBounds(Vector3i coord)
+    {
+        Vector3i currentSector = GetCurSector();
+
+        if (coord >= currentSector - Vector3i.one * sectorRadius &&
+            coord <= currentSector + Vector3i.one * sectorRadius)
+            return true;
+
+        return false;
+    }
+
     void SmartMovePhysical(int byX, int byY, int byZ)
     {
         Vector3i by = new Vector3i(byX, byY, byZ);
 
         bool[,,] regenSectors = new bool[sectorRange, sectorRange, sectorRange];
-
         // move entire universe to new sectors
         Sector[,,] tempSectors = sectors;
+
+
+        // reassign sector coordinates
+        foreach (var sector in sectors)
+        {
+
+            //sector.coordinate -= by;
+            //if ()
+        }
+
+        // detect if some sectors did not leave 
+
+        // recreate sectors with new coordinates
 
         foreach (var sector in sectors)
         {
             sector.coordinate += by;
+
+            // check if sector is still inside shifted bounds
+
+
+            if (!sector.IsOutOfBounds(sectorRange))
+            {
+                // if yes, move stars to new positions
+            }
+
+
+
+            //x = (x + delta) % maxX
             //sector.localCoordinate += by;
 
             //if (se)
@@ -310,9 +371,6 @@ public class SimplexUniverse : MonoBehaviour
         CreateSimplex();
 
         Sector s = new Sector();
-        //s.x = x;
-        //s.y = y;
-        //s.z = z;
 
         s.coordinate = new Vector3i(x, y, z);
 
@@ -360,6 +418,12 @@ public class SimplexUniverse : MonoBehaviour
 
         return s;
     }
+
+    Vector3i GetCurSector()
+    {
+        return new Vector3i(curSectorX, curSectorY, curSectorZ);
+    }
+
 
     private Vector3 RandomPointOnPlane(Vector3 normal, float radius)
     {
@@ -487,5 +551,7 @@ public class SimplexUniverse : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.U))
             Move(1, 0, 0);
+
+
     }
 }
