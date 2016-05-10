@@ -192,14 +192,15 @@ public class SimplexUniverse : MonoBehaviour
 
                 if (sector.planetPositions.Length > 0)
                 {
+                    sector.star[0].planets = new PlanetEntity[sector.planetPositions.Length];
+
                     for (int i = 0; i < sector.planetPositions.Length; i++)
                     {
-                        sector.star[0].planets = new PlanetEntity[sector.planetPositions.Length];
-
                         GameObject planetGO = Instantiate(planetPrefab, sectorStartPos + sector.planetPositions[i], Quaternion.identity) as GameObject;
                         if (Motion.e) Motion.e.chunks.Add(planetGO.transform);
 
                         sector.star[0].planets[i] = planetGO.GetComponent<PlanetEntity>();
+                        if (!sector.star[0].planets[i]) Debug.LogWarning("PlanetEntity not found");
                     }
                 }
             }
@@ -211,6 +212,8 @@ public class SimplexUniverse : MonoBehaviour
         foreach (Sector sector in sectors)
         {
             if (!sector.hasSystem) continue;
+
+            if (sector.star == null) Debug.LogWarning("Stars are null");
 
             foreach (var star in sector.star)
             {
