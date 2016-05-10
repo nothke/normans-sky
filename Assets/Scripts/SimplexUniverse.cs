@@ -140,11 +140,37 @@ public class SimplexUniverse : MonoBehaviour
         GeneratePhysical();
     }
 
+    void ClearAllPhysical()
+    {
+        foreach (var sector in sectors)
+        {
+            if (!sector.hasSystem) continue;
+
+            if (sector.star == null) continue;
+
+            if (sector.star.Length == 0) continue;
+
+            for (int i = 0; i < sector.star.Length; i++)
+            {
+                if (sector.star[i].planets.Length > 0) continue;
+
+                for (int j = 0; j < sector.star[i].planets.Length; j++)
+                {
+                    Destroy(sector.star[i].planets[j].gameObject);
+                }
+
+                Destroy(sector.star[i].gameObject);
+            }
+        }
+    }
+
     void GeneratePhysical()
     {
         if (!generate) return;
 
         if (!starPrefab || !planetPrefab) return;
+
+        ClearAllPhysical();
 
         foreach (var sector in sectors)
         {
@@ -160,18 +186,20 @@ public class SimplexUniverse : MonoBehaviour
                 if (Motion.e) Motion.e.chunks.Add(starGO.transform);
                 // material color?
 
-                //Gizmos.DrawSphere(sectorStartPos + sector.starPostion, starPreviewRadius);
+                // if not a nebula generate only one star
+                sector.star = new StarEntity[1];
+                sector.star[0] = starGO.GetComponent<StarEntity>();
 
                 if (sector.planetPositions.Length > 0)
                 {
                     for (int i = 0; i < sector.planetPositions.Length; i++)
                     {
+                        sector.star[0].planets = new PlanetEntity[sector.planetPositions.Length];
 
                         GameObject planetGO = Instantiate(planetPrefab, sectorStartPos + sector.planetPositions[i], Quaternion.identity) as GameObject;
                         if (Motion.e) Motion.e.chunks.Add(planetGO.transform);
 
-                        //Gizmos.DrawSphere(sectorStartPos + sector.planetPositions[i], planetPreviewRadius);
-                        //UnityEditor.Handles.DrawWireDisc(sectorStartPos + sector.starPostion, sector.orbitNormal, sector.planetOrbits[i]);
+                        sector.star[0].planets[i] = planetGO.GetComponent<PlanetEntity>();
                     }
                 }
             }
@@ -182,11 +210,14 @@ public class SimplexUniverse : MonoBehaviour
     {
         foreach (Sector sector in sectors)
         {
+            if (!sector.hasSystem) continue;
+
             foreach (var star in sector.star)
             {
                 foreach (var planet in star.planets)
                 {
-                    Destroy(planet.gameObject);
+                    if (planet)
+                        Destroy(planet.gameObject);
                 }
 
                 Destroy(star.gameObject);
@@ -369,6 +400,7 @@ public class SimplexUniverse : MonoBehaviour
 
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.U))
+            Move(1, 0, 0);
     }
 }
