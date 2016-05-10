@@ -102,6 +102,7 @@
     <Compile Include="Assets\Scripts\UISwitch.cs" />
     <Compile Include="Assets\Scripts\Universe.cs" />
     <Compile Include="Assets\Scripts\Utils.cs" />
+    <Compile Include="Assets\Scripts\VectorExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\PlanetNames.txt" />

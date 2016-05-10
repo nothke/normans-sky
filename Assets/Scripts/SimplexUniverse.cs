@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using VectorExtensions;
 
 public class SimplexUniverse : MonoBehaviour
 {
@@ -81,9 +82,11 @@ public class SimplexUniverse : MonoBehaviour
 
     public class Sector
     {
-        public int x;
-        public int y;
-        public int z;
+        public Vector3i coordinate;
+        public Vector3i localCoordinate;
+        //public int x;
+        //public int y;
+        //public int z;
 
         public bool hasSystem;
 
@@ -100,6 +103,25 @@ public class SimplexUniverse : MonoBehaviour
         public Color[] planetColors;
 
         public StarEntity[] star;
+
+        /*
+        public void AddCoord(int byX, int byY, int byZ)
+        {
+            x += byX;
+            y += byY;
+            z += byZ;
+        }*/
+
+        public bool IsOutOfBounds(int boundsSize)
+        {
+            return true; // INCOMPLETE
+        }
+
+        public void GiveStar(Sector otherSector)
+        {
+            otherSector.star = star;
+            star = null;
+        }
     }
 
     void CreateSimplex()
@@ -109,9 +131,14 @@ public class SimplexUniverse : MonoBehaviour
 
     Sector[,,] sectors;
 
+    int GetSectorRange()
+    {
+        return sectorRadius * 2 + 1;
+    }
+
     void CreateAllSectors()
     {
-        sectorRange = sectorRadius * 2 + 1;
+        sectorRange = GetSectorRange();
 
         sectors = new Sector[sectorRange, sectorRange, sectorRange];
 
@@ -140,6 +167,32 @@ public class SimplexUniverse : MonoBehaviour
         GeneratePhysical();
 
         //StartCoroutine(SkipFrame());
+    }
+
+    void SmartMovePhysical(int byX, int byY, int byZ)
+    {
+        Vector3i by = new Vector3i(byX, byY, byZ);
+
+        bool[,,] regenSectors = new bool[sectorRange, sectorRange, sectorRange];
+
+        // move entire universe to new sectors
+        Sector[,,] tempSectors = sectors;
+
+        foreach (var sector in sectors)
+        {
+            sector.coordinate += by;
+            //sector.localCoordinate += by;
+
+            //if (se)
+        }
+
+
+
+        for (int i = 0; i < sectors.Length; i++)
+        {
+        }
+
+
     }
 
     void ClearAllPhysical()
@@ -257,10 +310,11 @@ public class SimplexUniverse : MonoBehaviour
         CreateSimplex();
 
         Sector s = new Sector();
-        s.x = x;
-        s.y = y;
-        s.z = z;
+        //s.x = x;
+        //s.y = y;
+        //s.z = z;
 
+        s.coordinate = new Vector3i(x, y, z);
 
 
         float value = simplex.coherentNoise(x, y, z, octaves, multiplier, amplitude, lacunarity, persistence);
@@ -272,8 +326,7 @@ public class SimplexUniverse : MonoBehaviour
             return s;
 
         // has a solar system:
-
-        if (skipZero && s.x == 0 && s.y == 0 && s.z == 0)
+        if (skipZero && s.coordinate == Vector3i.zero)
             return s;
 
         s.hasSystem = true;
@@ -323,6 +376,11 @@ public class SimplexUniverse : MonoBehaviour
         return randomPoint;
     }
 
+    Vector3 GetSectorMidPos(Sector s)
+    {
+        return GetSectorMidPos(s.coordinate.x, s.coordinate.y, s.coordinate.z);
+    }
+
     Vector3 GetSectorMidPos(int x, int y, int z)
     {
         Vector3 relativeSector = new Vector3(x - curSectorX, y - curSectorY, z - curSectorZ);
@@ -333,7 +391,7 @@ public class SimplexUniverse : MonoBehaviour
 
     Vector3 GetSectorStartPos(Sector s)
     {
-        return GetSectorStartPos(s.x, s.y, s.z);
+        return GetSectorStartPos(s.coordinate.x, s.coordinate.y, s.coordinate.z);
     }
 
     Vector3 GetSectorStartPos(int x, int y, int z)
@@ -390,7 +448,7 @@ public class SimplexUniverse : MonoBehaviour
                 if (previewSectors)
                 {
                     Gizmos.color = Color.gray;
-                    Gizmos.DrawWireCube(GetSectorMidPos(sector.x, sector.y, sector.z), Vector3.one * sectorSeparation);
+                    Gizmos.DrawWireCube(GetSectorMidPos(sector), Vector3.one * sectorSeparation);
                 }
 
                 if (previewSystems)
