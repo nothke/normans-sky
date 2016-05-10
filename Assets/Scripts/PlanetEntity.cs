@@ -49,7 +49,7 @@ public class PlanetEntity : CelestialBody
 
         if (atmosphere)
             if (atmoSphereSphere != null)
-                if (atmoSphereSphere.gameObject != null)
+                if (!atmoSphereSphere && atmoSphereSphere.gameObject != null)
                     atmoSphereSphere.localScale = Vector3.one * (radius + atmosphereHeight) * worldScale;
     }
 }
