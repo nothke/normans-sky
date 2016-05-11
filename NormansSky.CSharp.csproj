@@ -107,9 +107,12 @@
   <ItemGroup>
     <None Include="Assets\PlanetNames.txt" />
     <None Include="Assets\Shaders\ExampleVertexColorShader.shader" />
+    <None Include="Assets\Shaders\PerlinTest.shader" />
     <None Include="Assets\Shaders\Planet.shader" />
     <None Include="Assets\Shaders\RingSurface.shader" />
+    <None Include="Assets\Shaders\SimpleTesselation.shader" />
     <None Include="Assets\Shaders\SphericalFog.shader" />
+    <None Include="Assets\Shaders\StandardTessTest.shader" />
     <None Include="Assets\Shaders\TransparentFresnel.shader" />
     <None Include="Assets\Shaders\TransparentFresnelEmissive.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
