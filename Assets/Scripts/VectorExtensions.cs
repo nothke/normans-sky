@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace VectorExtensions
 {
@@ -106,6 +105,11 @@ namespace VectorExtensions
             // TODO: write your implementation of GetHashCode() here
             throw new System.NotImplementedException();
             //return base.GetHashCode();
+        }
+
+        public static explicit operator Vector3(Vector3i v)
+        {
+            return new Vector3(v.x, v.y, v.z);
         }
     }
 }

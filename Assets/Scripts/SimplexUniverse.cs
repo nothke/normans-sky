@@ -83,7 +83,7 @@ public class SimplexUniverse : MonoBehaviour
     public class Sector
     {
         public Vector3i coordinate;
-        public Vector3i localCoordinate;
+        //public Vector3i localCoordinate;
 
         public bool hasSystem;
 
@@ -102,6 +102,7 @@ public class SimplexUniverse : MonoBehaviour
         public StarEntity[] star;
         public StarEntity[] newStar;
 
+        /*
         public bool IsOutOfBounds(int boundsSize)
         {
             if (localCoordinate.x >= boundsSize) return true;
@@ -112,7 +113,7 @@ public class SimplexUniverse : MonoBehaviour
             if (localCoordinate.z < 0) return true;
 
             return false;
-        }
+        }*/
 
         public void GiveStar(Sector otherSector)
         {
@@ -148,7 +149,7 @@ public class SimplexUniverse : MonoBehaviour
             {
                 for (int z = 0; z < sectorRange; z++)
                 {
-                    sectors[x, y, z] = CreateNewSector(curSectorX + x, curSectorY + y, curSectorZ + z);
+                    sectors[x, y, z] = CreateNewSector(curSectorX - sectorRadius + x, curSectorY - sectorRadius + y, curSectorZ - sectorRadius + z);
 
                 }
             }
@@ -157,9 +158,7 @@ public class SimplexUniverse : MonoBehaviour
 
     void Move(int byX, int byY, int byZ)
     {
-        curSectorX += byX;
-        curSectorY += byY;
-        curSectorZ += byZ;
+
 
         SmartMovePhysical(byX, byY, byZ);
 
@@ -188,24 +187,29 @@ public class SimplexUniverse : MonoBehaviour
     {
         Vector3i by = new Vector3i(byX, byY, byZ);
 
-        //bool[,,] regenSectors = new bool[sectorRange, sectorRange, sectorRange];
-        // move entire universe to new sectors
-        //Sector[,,] tempSectors = sectors.Clone() as Sector[,,];
-
         // PASS 1 - rearrange and clean
         foreach (var sector in sectors)
         {
             if (CoordinateIsInsideBounds(sector.coordinate + by))
             {
-                // if future sector is also inside bounds, assign the star from this sector to a temporary one
-                GetSectorAtLocal(sector.coordinate + by).newStar = sector.star;
+                // if next sector is inside bounds, assign the star from next sector to this sector
+                sector.newStar = GetSectorFromWorldCoord(sector.coordinate + by).star;
+                // and move it
+                ShiftSystem(sector.newStar, -by);
+
+                //GetSectorFromWorldCoord(sector.coordinate + by).newStar = sector.star;
             }
             else
             {
                 // else destroy the star system..
                 DestroySystem(sector.star);
+                sector.star = null;
             }
         }
+
+        curSectorX += byX;
+        curSectorY += byY;
+        curSectorZ += byZ;
 
         // PASS 2 - construct
         foreach (var sector in sectors)
@@ -218,53 +222,33 @@ public class SimplexUniverse : MonoBehaviour
             {
                 sector.star = sector.newStar;
 
-                // and move them
-
             }
+
+            sector.newStar = null;
 
             // and regenerate sector
             CreateSector(sector);
 
+            /*
             // if sector has no physical star, create new one
             if (sector.star == null)
-                GeneratePhysical(sector);
+                GeneratePhysical(sector);*/
         }
+    }
 
-        // then recreate all sectors
-        //CreateAllSectors();
+    void ShiftSystem(StarEntity[] stars, Vector3i by)
+    {
+        if (stars == null) return;
 
-        /*
-        // detect if some sectors did not leave 
+        Vector3 moveBy = (Vector3)by * sectorSeparation;
 
-        // recreate sectors with new coordinates
-
-        foreach (var sector in sectors)
+        foreach (var star in stars)
         {
-            sector.coordinate += by;
+            star.transform.position += moveBy;
 
-            // check if sector is still inside shifted bounds
-
-
-            if (!sector.IsOutOfBounds(sectorRange))
-            {
-                // if yes, move stars to new positions
-            }
-
-
-
-            //x = (x + delta) % maxX
-            //sector.localCoordinate += by;
-
-            //if (se)
+            foreach (var planet in star.planets)
+                planet.transform.position += moveBy;
         }
-
-
-
-        for (int i = 0; i < sectors.Length; i++)
-        {
-        }
-
-    */
     }
 
     void RegenerateSector(Sector s)
@@ -272,9 +256,10 @@ public class SimplexUniverse : MonoBehaviour
 
     }
 
-    Sector GetSectorAtLocal(Vector3i coord)
+    Sector GetSectorFromWorldCoord(Vector3i coord)
     {
-        Vector3i localCoord = coord - GetCurSector();
+        Vector3i localCoord = coord + Vector3i.one * sectorRadius - GetCurSector();
+
         return sectors[localCoord.x, localCoord.y, localCoord.z];
     }
 
@@ -454,18 +439,35 @@ public class SimplexUniverse : MonoBehaviour
     {
         if (stars == null) return;
 
-        foreach (var star in stars)
+        if (stars.Length == 0) return;
+
+        for (int i = 0; i < stars.Length; i++)
         {
-            foreach (var planet in star.planets)
+            if (stars[i].planets.Length == 0) continue;
+
+            for (int j = 0; j < stars[i].planets.Length; j++)
             {
-                if (planet)
-                    Destroy(planet.gameObject);
+                //if (stars[i].planets[i]) // shouldn't happen
+                Destroy(stars[i].planets[i].gameObject);
             }
 
-            Destroy(star.gameObject);
+            Destroy(stars[i].gameObject);
+        }
+        /*
+    }
+
+    foreach (var star in stars)
+    {
+        foreach (var planet in star.planets)
+        {
+            if (planet)
+                Destroy(planet.gameObject);
         }
 
-        stars = null;
+        Destroy(star.gameObject);
+    }
+
+    stars = null;*/
     }
 
     Vector3i GetCurSector()
@@ -497,7 +499,7 @@ public class SimplexUniverse : MonoBehaviour
     Vector3 GetSectorMidPos(int x, int y, int z)
     {
         Vector3 relativeSector = new Vector3(x - curSectorX, y - curSectorY, z - curSectorZ);
-        relativeSector -= Vector3.one * (0.5f * sectorRange - 0.5f);
+        //relativeSector -= Vector3.one * (0.5f * sectorRange - 0.5f);
 
         return relativeSector * sectorSeparation;
     }
