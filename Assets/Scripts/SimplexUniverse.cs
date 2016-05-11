@@ -190,12 +190,18 @@ public class SimplexUniverse : MonoBehaviour
         // PASS 1 - rearrange and clean
         foreach (var sector in sectors)
         {
-            if (CoordinateIsInsideBounds(sector.coordinate + by))
+            if (CoordinateIsInsideBounds(sector.coordinate - by))
             {
                 // if next sector is inside bounds, assign the star from next sector to this sector
-                sector.newStar = GetSectorFromWorldCoord(sector.coordinate + by).star;
-                // and move it
-                ShiftSystem(sector.newStar, -by);
+                //sector.newStar = GetSectorFromWorldCoord(sector.coordinate + by).star;
+
+                // if next sector is inside bounds
+                Sector nextSector = GetSectorFromWorldCoord(sector.coordinate - by);
+                nextSector.newStar = sector.star;
+
+                // and move it if has any star
+                //ShiftSystem(sector.newStar, -by);
+                ShiftSystem(nextSector.newStar, -by);
 
                 //GetSectorFromWorldCoord(sector.coordinate + by).newStar = sector.star;
             }
@@ -217,22 +223,19 @@ public class SimplexUniverse : MonoBehaviour
             // now set new coordinates
             sector.coordinate = sector.coordinate + by;
 
-            // now overwrite stars
+            // now overwrite star
             if (sector.newStar != null)
-            {
                 sector.star = sector.newStar;
-
-            }
 
             sector.newStar = null;
 
             // and regenerate sector
             CreateSector(sector);
 
-            /*
             // if sector has no physical star, create new one
-            if (sector.star == null)
-                GeneratePhysical(sector);*/
+            if (sector.hasSystem)
+                if (sector.star == null)
+                    GeneratePhysical(sector);
         }
     }
 
@@ -249,11 +252,6 @@ public class SimplexUniverse : MonoBehaviour
             foreach (var planet in star.planets)
                 planet.transform.position += moveBy;
         }
-    }
-
-    void RegenerateSector(Sector s)
-    {
-
     }
 
     Sector GetSectorFromWorldCoord(Vector3i coord)
