@@ -83,7 +83,6 @@ public class SimplexUniverse : MonoBehaviour
     public class Sector
     {
         public Vector3i coordinate;
-        //public Vector3i localCoordinate;
 
         public bool hasSystem;
 
@@ -102,25 +101,6 @@ public class SimplexUniverse : MonoBehaviour
         public StarEntity[] star;
         public StarEntity[] newStar;
         public bool flagDestroy;
-
-        /*
-        public bool IsOutOfBounds(int boundsSize)
-        {
-            if (localCoordinate.x >= boundsSize) return true;
-            if (localCoordinate.y >= boundsSize) return true;
-            if (localCoordinate.z >= boundsSize) return true;
-            if (localCoordinate.x < 0) return true;
-            if (localCoordinate.y < 0) return true;
-            if (localCoordinate.z < 0) return true;
-
-            return false;
-        }*/
-
-        public void GiveStar(Sector otherSector)
-        {
-            otherSector.star = star;
-            star = null;
-        }
     }
 
     void CreateSimplex()
@@ -134,9 +114,6 @@ public class SimplexUniverse : MonoBehaviour
     {
         return sectorRadius * 2 + 1;
     }
-
-
-
 
     void CreateAllSectors()
     {
@@ -167,8 +144,6 @@ public class SimplexUniverse : MonoBehaviour
 
         GeneratePhysical();
         */
-
-        //StartCoroutine(SkipFrame());
     }
 
     bool CoordinateIsInsideBounds(Vector3i coord)
@@ -186,39 +161,31 @@ public class SimplexUniverse : MonoBehaviour
     {
         Vector3i by = new Vector3i(byX, byY, byZ);
 
-        // PASS 1 - rearrange and clean
+        // PASS 1 - rearrange and flag
         foreach (var sector in sectors)
         {
             if (CoordinateIsInsideBounds(sector.coordinate - by))
             {
-                // if next sector is inside bounds, assign the star from next sector to this sector
-                //sector.newStar = GetSectorFromWorldCoord(sector.coordinate + by).star;
-
-                // if next sector is inside bounds
+                // if next sector is inside bounds, transfer this system into the next sector..
                 Sector nextSector = GetSectorFromWorldCoord(sector.coordinate - by);
                 nextSector.newStar = sector.star;
 
-                // and move it if has any star
-                //ShiftSystem(sector.newStar, -by);
+                // ..and move it if it has any star
                 ShiftSystem(nextSector.newStar, -by);
-
-                //GetSectorFromWorldCoord(sector.coordinate + by).newStar = sector.star;
             }
             else
             {
-                // else flag for destruction star system..
+                // else flag system for destruction
                 sector.flagDestroy = true;
-
-                //DestroySystem(sector.star);
-                //sector.star = null;
             }
         }
 
+        // change current sector
         curSectorX += byX;
         curSectorY += byY;
         curSectorZ += byZ;
 
-        // PASS 2 - construct
+        // PASS 2 - destroy and construct
         foreach (var sector in sectors)
         {
             if (sector.flagDestroy)
@@ -233,13 +200,13 @@ public class SimplexUniverse : MonoBehaviour
             // now set new coordinates
             sector.coordinate = sector.coordinate + by;
 
-            // now overwrite star
+            // overwrite star with ones that are transfered
             if (sector.newStar != null)
                 sector.star = sector.newStar;
 
             sector.newStar = null;
 
-            // and regenerate sector
+            // and recreate sector data
             CreateSector(sector);
 
             // if sector has no physical star, create new one
@@ -490,7 +457,7 @@ public class SimplexUniverse : MonoBehaviour
     Vector3 GetSectorMidPos(int x, int y, int z)
     {
         Vector3 relativeSector = new Vector3(x - curSectorX, y - curSectorY, z - curSectorZ);
-        //relativeSector -= Vector3.one * (0.5f * sectorRange - 0.5f);
+        //relativeSector -= Vector3.one * (0.5f * sectorRange - 0.5f); // OLD calc
 
         return relativeSector * sectorSeparation;
     }
@@ -517,14 +484,7 @@ public class SimplexUniverse : MonoBehaviour
             updateNames = false;
         }
 
-        return;
-
-        if (sectors == null)
-        {
-            CreateAllSectors();
-        }
-
-
+        /*
         if (curSectorX != prevCurX || curSectorY != prevCurY || curSectorZ != prevCurZ)
         {
             CreateAllSectors();
@@ -532,7 +492,7 @@ public class SimplexUniverse : MonoBehaviour
             prevCurX = curSectorX;
             prevCurY = curSectorY;
             prevCurZ = curSectorZ;
-        }
+        }*/
     }
 
     void OnDrawGizmos()
@@ -592,9 +552,13 @@ public class SimplexUniverse : MonoBehaviour
 
     void Update()
     {
+#if UNITY_EDITOR
+
+
         if (Input.GetKeyDown(KeyCode.U))
             Move(0, 1, 0);
 
+#endif
 
     }
 }
