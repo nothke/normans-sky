@@ -101,6 +101,7 @@ public class SimplexUniverse : MonoBehaviour
 
         public StarEntity[] star;
         public StarEntity[] newStar;
+        public bool flagDestroy;
 
         /*
         public bool IsOutOfBounds(int boundsSize)
@@ -158,8 +159,6 @@ public class SimplexUniverse : MonoBehaviour
 
     void Move(int byX, int byY, int byZ)
     {
-
-
         SmartMovePhysical(byX, byY, byZ);
 
         /*
@@ -207,9 +206,11 @@ public class SimplexUniverse : MonoBehaviour
             }
             else
             {
-                // else destroy the star system..
-                DestroySystem(sector.star);
-                sector.star = null;
+                // else flag for destruction star system..
+                sector.flagDestroy = true;
+
+                //DestroySystem(sector.star);
+                //sector.star = null;
             }
         }
 
@@ -220,6 +221,15 @@ public class SimplexUniverse : MonoBehaviour
         // PASS 2 - construct
         foreach (var sector in sectors)
         {
+            if (sector.flagDestroy)
+            {
+                DestroySystem(sector.star);
+
+                sector.flagDestroy = false;
+            }
+
+            sector.star = null;
+
             // now set new coordinates
             sector.coordinate = sector.coordinate + by;
 
@@ -233,9 +243,8 @@ public class SimplexUniverse : MonoBehaviour
             CreateSector(sector);
 
             // if sector has no physical star, create new one
-            if (sector.hasSystem)
-                if (sector.star == null)
-                    GeneratePhysical(sector);
+            if (sector.star == null)
+                GeneratePhysical(sector);
         }
     }
 
@@ -441,31 +450,15 @@ public class SimplexUniverse : MonoBehaviour
 
         for (int i = 0; i < stars.Length; i++)
         {
-            if (stars[i].planets.Length == 0) continue;
-
-            for (int j = 0; j < stars[i].planets.Length; j++)
-            {
-                //if (stars[i].planets[i]) // shouldn't happen
-                Destroy(stars[i].planets[i].gameObject);
-            }
+            if (stars[i].planets.Length > 0)
+                for (int j = 0; j < stars[i].planets.Length; j++)
+                {
+                    //if (stars[i].planets[i]) // shouldn't happen
+                    Destroy(stars[i].planets[j].gameObject);
+                }
 
             Destroy(stars[i].gameObject);
         }
-        /*
-    }
-
-    foreach (var star in stars)
-    {
-        foreach (var planet in star.planets)
-        {
-            if (planet)
-                Destroy(planet.gameObject);
-        }
-
-        Destroy(star.gameObject);
-    }
-
-    stars = null;*/
     }
 
     Vector3i GetCurSector()
@@ -600,7 +593,7 @@ public class SimplexUniverse : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.U))
-            Move(1, 0, 0);
+            Move(0, 1, 0);
 
 
     }
