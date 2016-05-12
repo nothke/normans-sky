@@ -105,6 +105,7 @@
   <ItemGroup>
     <None Include="Assets\PlanetNames.txt" />
     <None Include="Assets\Shaders\ExampleVertexColorShader.shader" />
+    <None Include="Assets\Shaders\NormalMapFromBump.shader" />
     <None Include="Assets\Shaders\PerlinTest.shader" />
     <None Include="Assets\Shaders\Planet.shader" />
     <None Include="Assets\Shaders\RingSurface.shader" />
@@ -184,6 +185,13 @@
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLit.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLitOutline.shader" />
+    <None Include="Assets\TerrainModifiers\BlitAddColor.shader" />
+    <None Include="Assets\TerrainModifiers\BlitColor.shader" />
+    <None Include="Assets\TerrainModifiers\BlitInvert.shader" />
+    <None Include="Assets\TerrainModifiers\BlitPerlin.shader" />
+    <None Include="Assets\TerrainModifiers\BlitSetTexture.shader" />
+    <None Include="Assets\TerrainModifiers\BlitStep.shader" />
+    <None Include="Assets\TerrainModifiers\LeonsPerlin.cginc" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

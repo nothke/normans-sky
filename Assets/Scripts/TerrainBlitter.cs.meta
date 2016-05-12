@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 46baa243050e169408859565b8574bcb
+timeCreated: 1463090579
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - rt: {fileID: 8400000, guid: 79775146c16743042b847fc47d05581f, type: 2}
+  - blitMat: {fileID: 2100000, guid: 65513742431118840be2598c345feb39, type: 2}
+  - startTexture: {fileID: 2800000, guid: e9b953830172b9d43ba768d609515e08, type: 3}
+  - startShader: {fileID: 10755, guid: 0000000000000000f000000000000000, type: 0}
+  - perlin: {fileID: 4800000, guid: c321c6c92a967e64296877a8133c9289, type: 3}
+  - inverter: {fileID: 4800000, guid: b28d0fcba2658b5489e22beeb012356c, type: 3}
+  - setColor: {fileID: 4800000, guid: 54d2195439db60244935b9c001f9e72c, type: 3}
+  - addColor: {fileID: 4800000, guid: 1d1916f72703fac43a8f582fc55284ed, type: 3}
+  - step: {fileID: 4800000, guid: c685c0ef239bc414ca87b397ab136830, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

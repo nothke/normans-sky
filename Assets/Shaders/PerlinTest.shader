@@ -86,7 +86,7 @@
 		half _Displacement;
 
 		void vert(inout appdata  v) {
-			float3 worldPos = mul(_Object2World, v.vertex).xyz + _Time * 10;
+			float3 worldPos = mul(_Object2World, v.vertex).xyz;// + _Time * 10;
 			float3 vertexBase = v.vertex.xyz;
 
 			float finNoise = finalNoise(worldPos);
