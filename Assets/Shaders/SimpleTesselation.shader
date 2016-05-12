@@ -15,7 +15,6 @@
 		CGPROGRAM
 #pragma surface surf BlinnPhong addshadow fullforwardshadows vertex:disp tessellate:tessFixed nolightmap
 #pragma target 5.0
-#include "Tessellation.cginc"
 
 	struct appdata {
 		float4 vertex : POSITION;

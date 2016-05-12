@@ -126,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\PlanetNames.txt" />
+    <None Include="Assets\Shaders\AtmosphereShader.shader" />
     <None Include="Assets\Shaders\ExampleVertexColorShader.shader" />
     <None Include="Assets\Shaders\NormalMapFromBump.shader" />
     <None Include="Assets\Shaders\PerlinTest.shader" />
