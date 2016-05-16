@@ -61,6 +61,18 @@
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
+    <Reference Include="DOTween">
+      <HintPath>Assets\Demigiant\DOTween\DOTween.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween43">
+      <HintPath>Assets\Demigiant\DOTween\DOTween43.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween50">
+      <HintPath>Assets\Demigiant\DOTween\DOTween50.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween46">
+      <HintPath>Assets\Demigiant\DOTween\DOTween46.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="NormansSky.CSharp.Plugins.csproj">
@@ -75,7 +87,9 @@
     <Compile Include="Assets\Scripts\AudioExtensions.cs" />
     <Compile Include="Assets\Scripts\CelestialBody.cs" />
     <Compile Include="Assets\Scripts\CelestialGravity.cs" />
+    <Compile Include="Assets\Scripts\CockpitMenu.cs" />
     <Compile Include="Assets\Scripts\Example.cs" />
+    <Compile Include="Assets\Scripts\Menu.cs" />
     <Compile Include="Assets\Scripts\Motion.cs" />
     <Compile Include="Assets\Scripts\Move.cs" />
     <Compile Include="Assets\Scripts\MoveTest.cs" />
@@ -106,6 +120,12 @@
     <Compile Include="Assets\Scripts\VectorExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Demigiant\DOTween\DOTween.XML" />
+    <None Include="Assets\Demigiant\DOTween\DOTween43.xml" />
+    <None Include="Assets\Demigiant\DOTween\DOTween46.xml" />
+    <None Include="Assets\Demigiant\DOTween\DOTween50.xml" />
+    <None Include="Assets\Demigiant\DOTween\Editor\DOTweenEditor.XML" />
+    <None Include="Assets\Demigiant\DOTween\readme.txt" />
     <None Include="Assets\PlanetNames.txt" />
     <None Include="Assets\Shaders\AtmosphereShader.shader" />
     <None Include="Assets\Shaders\ExampleVertexColorShader.shader" />
