@@ -1,13 +1,15 @@
 fileFormatVersion: 2
-guid: eaa528613a6172c41b563fa45647e648
-timeCreated: 1463633472
+guid: 466dda2dec0e02146ae309f203376f15
+timeCreated: 1464096289
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: cockpit_0
-    21300002: cockpit_1
-    21300004: cockpit_2
-    21300006: cockpit_3
+    21300000: hud_selectors_0
+    21300002: switch_base
+    21300004: switch_head
+    21300006: flow_indicator
+    21300008: pushSwitch_up
+    21300010: pushSwitch_down
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -48,77 +50,78 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 1
   alphaIsTransparency: 1
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: cockpit_0
+    - name: hud_selectors_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 64
-        width: 64
-        height: 64
+        y: 55
+        width: 9
+        height: 9
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -32, y: 32}
-        - {x: -32, y: -32}
-        - {x: 32, y: -32}
-        - {x: 32, y: 29}
-        - {x: 22, y: 32}
-    - name: cockpit_1
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 89
-        width: 64
-        height: 32
-      alignment: 2
-      pivot: {x: 0.5, y: 1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -32, y: 0}
-        - {x: -32, y: -32}
-        - {x: 32, y: -32}
-        - {x: 32, y: -1}
-        - {x: 31, y: 0}
-    - name: cockpit_2
+      outline: []
+    - name: switch_base
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 64
-        height: 64
+        y: 47
+        width: 7
+        height: 7
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -31, y: 25}
-        - {x: -32, y: 24}
-        - {x: -32, y: -32}
-        - {x: 32, y: -32}
-        - {x: 32, y: 23}
-        - {x: 20, y: 25}
-    - name: cockpit_3
+      outline: []
+    - name: switch_head
       rect:
         serializedVersion: 2
-        x: 64
-        y: 0
-        width: 64
-        height: 64
+        x: 2
+        y: 44
+        width: 3
+        height: 2
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -12, y: 32}
-        - {x: -32, y: 25}
-        - {x: -32, y: -32}
-        - {x: 32, y: -32}
-        - {x: 32, y: 32}
+      outline: []
+    - name: flow_indicator
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 38
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: pushSwitch_up
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 48
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: pushSwitch_down
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 42
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
     outline: []
   spritePackingTag: 
   userData: 

@@ -67,11 +67,11 @@
     <Reference Include="DOTween43">
       <HintPath>Assets\Demigiant\DOTween\DOTween43.dll</HintPath>
     </Reference>
-    <Reference Include="DOTween50">
-      <HintPath>Assets\Demigiant\DOTween\DOTween50.dll</HintPath>
-    </Reference>
     <Reference Include="DOTween46">
       <HintPath>Assets\Demigiant\DOTween\DOTween46.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween50">
+      <HintPath>Assets\Demigiant\DOTween\DOTween50.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +89,7 @@
     <Compile Include="Assets\Scripts\CelestialGravity.cs" />
     <Compile Include="Assets\Scripts\CockpitMenu.cs" />
     <Compile Include="Assets\Scripts\Example.cs" />
+    <Compile Include="Assets\Scripts\HUDSwitch.cs" />
     <Compile Include="Assets\Scripts\Menu.cs" />
     <Compile Include="Assets\Scripts\Motion.cs" />
     <Compile Include="Assets\Scripts\Move.cs" />
@@ -101,11 +102,13 @@
     <Compile Include="Assets\Scripts\RingMaker.cs" />
     <Compile Include="Assets\Scripts\SReader.cs" />
     <Compile Include="Assets\Scripts\Shake.cs" />
+    <Compile Include="Assets\Scripts\ShipSystems.cs" />
     <Compile Include="Assets\Scripts\SimplexNoiseGenerator.cs" />
     <Compile Include="Assets\Scripts\SimplexTest.cs" />
     <Compile Include="Assets\Scripts\SimplexUniverse.cs" />
     <Compile Include="Assets\Scripts\SkyUtils.cs" />
     <Compile Include="Assets\Scripts\SpacecraftUI.cs" />
+    <Compile Include="Assets\Scripts\Spectrum.cs" />
     <Compile Include="Assets\Scripts\SphericalFog.cs" />
     <Compile Include="Assets\Scripts\StarEntity.cs" />
     <Compile Include="Assets\Scripts\TerrainBlitter.cs" />
