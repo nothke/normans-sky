@@ -12,6 +12,8 @@ public class Motion : MonoBehaviour
 {
     public static Motion e;
 
+
+
     public List<Transform> chunks = new List<Transform>();
     public float shiftRange = 10;
     public float translateForce = 100000;
@@ -283,6 +285,8 @@ public class Motion : MonoBehaviour
         float rcsTarget = 0;
         float mainEngineTarget = 0;
 
+        ShipSystems.e.FireRCS(Input.GetAxis("Forward"), Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"),
+            Input.GetAxis("Roll"), Input.GetAxis("Pitch"), Input.GetAxis("Yaw"));
 
         if (Input.GetAxis("Roll") != 0 || Input.GetAxis("Yaw") != 0 || Input.GetAxis("Pitch") != 0 || Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
         {
@@ -292,6 +296,9 @@ public class Motion : MonoBehaviour
                 rcsTarget = 1;
         }
 
+        float mainEngineThrottle = Mathf.Clamp01(Input.GetAxis("Forward"));
+
+        ShipSystems.e.SetMainEngineTargetPower(mainEngineThrottle);
 
         if (Input.GetAxis("Forward") != 0)
             mainEngineTarget = 1;
@@ -306,7 +313,6 @@ public class Motion : MonoBehaviour
             speedticle.SetEmissionRate(0);
 
         //DebugAxes();
-
 
 
 

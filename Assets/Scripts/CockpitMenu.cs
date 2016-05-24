@@ -16,9 +16,7 @@ public class CockpitMenu : MonoBehaviour
 
     bool useCameraLook = true;
 
-    public Transform engine1Gauge;
-    public Transform engine2Gauge;
-    public Transform engine3Gauge;
+    public Transform[] engineGauges;
 
     public Transform cockpitHUD;
 
@@ -102,7 +100,7 @@ public class CockpitMenu : MonoBehaviour
 
     public void SystemsSelector(int by)
     {
-        sysSelAt = Repeat(sysSelAt + by, sysSwitches.Length - 1);
+        sysSelAt = Repeat(sysSelAt - by, sysSwitches.Length - 1);
         //Debug.Log(sysSelAt);
 
         HUDSwitch s = sysSwitches[sysSelAt];
@@ -126,12 +124,12 @@ public class CockpitMenu : MonoBehaviour
 
     void UpdateGauges()
     {
-        float engine = Motion.e.mainEngineAudio.volume;
-        float angle = 180 - engine * 270;
+        for (int i = 0; i < ShipSystems.e.engines.Length; i++)
+        {
+            float angle = 180 - ShipSystems.e.engines[i].power * 270;
 
-        engine1Gauge.localEulerAngles = Vector3.forward * angle;
-        engine2Gauge.localEulerAngles = Vector3.forward * angle;
-        engine3Gauge.localEulerAngles = Vector3.forward * angle;
+            engineGauges[i].localEulerAngles = Vector3.forward * angle;
+        }
     }
 
     int curX, curY;
