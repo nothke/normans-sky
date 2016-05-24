@@ -16,7 +16,7 @@ public class ShipSystems : MonoBehaviour
     public float voltageSmoothTime = 0.1f;
     public float voltageSmoothSpeed = 1;
 
-    float normalVoltage = 0.5f;
+    float normalVoltage = 0.7f;
     float load = 0;
 
     float targetVoltage;
@@ -130,6 +130,8 @@ public class ShipSystems : MonoBehaviour
             engines[i] = new Engine();
     }
 
+    bool prevPower;
+
     void Update()
     {
         voltage = Mathf.SmoothDamp(voltage, targetVoltage, ref voltageVelo, voltageSmoothTime, voltageSmoothSpeed);
@@ -145,7 +147,7 @@ public class ShipSystems : MonoBehaviour
             fuelFlow = 1;
         }
 
-        bool power = batteryOn && voltage > minTresholdVoltage;
+        bool power = voltage > minTresholdVoltage;
 
         if (batteryOn) targetVoltage = normalVoltage + load;
         else targetVoltage = 0;
@@ -156,17 +158,32 @@ public class ShipSystems : MonoBehaviour
 
             if (fuelOn && pumpOn)
                 fuelFlow = 2000;
-
-
         }
+
+        if (power != prevPower)
+            PowerChange();
 
         foreach (var engine in engines)
         {
-            if (!engine.isOn) continue;
-
-            fuelFlow = 3000;
+            if (!engine.isOn) engine.targetPower = 0;
+            else
+                fuelFlow = 3000;
 
             engine.power = Mathf.SmoothDamp(engine.power, engine.targetPower, ref engine.powerRefVelo, Engine.smoothingTime);
+        }
+
+        prevPower = power;
+    }
+
+    void PowerChange()
+    {
+        if (!prevPower)
+        {
+            workingAudio.DOFade(1, 0.2f);
+        }
+        else
+        {
+            workingAudio.DOFade(0, 0.2f);
         }
     }
 
@@ -198,9 +215,7 @@ public class ShipSystems : MonoBehaviour
     {
         batteryOn = i == 0 ? false : true;
 
-        if (batteryOn) workingAudio.DOFade(1, 0.2f);
-        else
-            workingAudio.DOFade(0, 0.2f);
+
     }
 
     bool fuelOn;
