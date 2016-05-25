@@ -432,6 +432,8 @@ public class CockpitMenu : MonoBehaviour
             Debug.LogError("EXCEPTION page doesn't exist but MUST!");
     }
 
+    int menuCursorPos;
+
     void DisplayMenu(string[] menuLines)
     {
         StopAllCoroutines(); // DIRTY
@@ -503,16 +505,10 @@ public class CockpitMenu : MonoBehaviour
         WriteText(tp.lines[atRecordPage]);
         atRecordPage++;
     }
-    
-    
-
-    int menuCursorPos;
-
-
 
     string displayStr;
 
-    IEnumerator BodyInfo()
+    IEnumerator BodyInfo() // TODO: implement all info
     {
         //StartCoroutine(ReturnToMainMenu());
 

@@ -154,7 +154,7 @@ public class ShipSystems : MonoBehaviour
 
         if (power)
         {
-            // BATTERY DEPENDANT STUFF HERE:
+            // BATTERY DEPENDENT STUFF HERE:
 
             if (fuelOn && pumpOn)
                 fuelFlow = 2000;
