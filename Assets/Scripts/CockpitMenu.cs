@@ -320,39 +320,48 @@ public class CockpitMenu : MonoBehaviour
 
         terminalPages.Add(new TerminalPage(
             "START UP",
-            TerminalPage.Type.Menu,
+            TerminalPage.Type.Record,
             new string[]
             {
-                "Systems module:\n" +
-                "1.BATT - on\n" +
-                "2.FUEL - on\n" +
-                "3.PUMP - on\n" +
-                "4.ENGINE 1 - on\n" +
-                "5.PUMP - off\n" +
-                "6.ENGINE 2 - on\n" +
-                "7.ENGINE 3 - on\n"
+                "Systems:\n" +
+                "1.BATT  -on\n" +
+                "2.FUEL  -on\n" +
+                "3.PUMP  -on\n" +
+                "4.ENGIN1-on\n" +
+                "5.PUMP  -off\n" +
+                "6.ENGIN2-on\n" +
+                "7.ENGIN3-on\n"
             },
             "CHECKLISTS"));
 
         terminalPages.Add(new TerminalPage(
             "SHUT DOWN",
-            TerminalPage.Type.Menu,
+            TerminalPage.Type.Record,
             new string[]
             {
-                "Systems module:\n" +
-                "1.FUEL - cut\n" +
-                "1.BATT - off\n"
+                "Systems:\n" +
+                "1.FUEL  -cut\n" +
+                "1.BATT  -off\n"
             },
             "CHECKLISTS"));
 
+        // EXCEPTION
 
         terminalPages.Add(new TerminalPage(
             "EXCEPTION",
             TerminalPage.Type.Record,
             new string[]
             {
-                "8888\nUnknown or unimplemented feature\n8888",
+                "\n888888888888\n\nUnknown or not implemented feature\n\n888888888888",
             },
+            "MAIN"));
+
+        // SPECIAL
+
+        terminalPages.Add(new TerminalPage(
+            "BODY INFO",
+            TerminalPage.Type.Update,
+            null,
             "MAIN"));
     }
 
@@ -376,13 +385,13 @@ public class CockpitMenu : MonoBehaviour
         currentTerminalPage = tp;
 
         if (tp.type == TerminalPage.Type.Menu)
-            DisplayMenu(tp.lines);
-
-        if (tp.type == TerminalPage.Type.Record)
         {
-
+            menuCursorPos = 0;
+            DisplayMenu(tp.lines);
         }
 
+        if (tp.type == TerminalPage.Type.Record)
+            NextRecordPage();
     }
 
     public TerminalPage GetTerminalPage(string key)
@@ -561,7 +570,7 @@ public class CockpitMenu : MonoBehaviour
         {
             case TerminalPage.Type.Menu:
                 DisplayTerminalPage(currentTerminalPage.lines[menuCursorPos]);
-                atRecordPage = 0;
+                menuCursorPos = 0;
                 break;
             case TerminalPage.Type.Record:
                 NextRecordPage();
@@ -575,16 +584,15 @@ public class CockpitMenu : MonoBehaviour
             default:
                 break;
         }
-
-        menuCursorPos = 0;
     }
 
     void NextRecordPage()
     {
         TerminalPage tp = currentTerminalPage;
 
-        if (atRecordPage >= tp.lines.Length - 1)
+        if (atRecordPage >= tp.lines.Length)
         {
+            atRecordPage = 0;
             DisplayTerminalPage(GetTerminalPage(tp.next));
             return;
         }
