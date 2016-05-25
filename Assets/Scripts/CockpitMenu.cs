@@ -234,6 +234,18 @@ public class CockpitMenu : MonoBehaviour
             },
             ""));
 
+        // CREDITS
+
+        terminalPages.Add(new TerminalPage(
+            "CREDITS",
+            TerminalPage.Type.Record,
+            new string[]
+            {
+                "Made by:\nIvan Notaros Nothke"
+                //"Made by:\nIvan Notaros Nothke\n\nMusic by\nMartin Kvale\n\nShader mage\nLeon Denise"
+            },
+            "MAIN"));
+
         // MANUAL
 
         terminalPages.Add(new TerminalPage(
@@ -345,6 +357,10 @@ public class CockpitMenu : MonoBehaviour
             },
             "CHECKLISTS"));
 
+
+
+        
+
         // EXCEPTION
 
         terminalPages.Add(new TerminalPage(
@@ -415,26 +431,6 @@ public class CockpitMenu : MonoBehaviour
             Debug.LogError("EXCEPTION page doesn't exist but MUST!");
     }
 
-    [System.Obsolete]
-    IEnumerator PlayRecord(string[] record)
-    {
-        if (record == null) { Debug.LogWarning("Record is null"); yield break; }
-        if (record.Length == 0) { Debug.LogWarning("Record is empty"); yield break; }
-
-        for (int i = 0; i < record.Length; i++)
-        {
-            WriteText(record[i]);
-
-            yield return null;
-            while (!Input.GetKeyDown(KeyCode.KeypadEnter) && !Input.GetKeyDown(KeyCode.Return))
-                yield return null;
-        }
-
-        DisplayMenu();
-    }
-
-
-
     void DisplayMenu(string[] menuLines)
     {
         StopAllCoroutines(); // DIRTY
@@ -452,87 +448,7 @@ public class CockpitMenu : MonoBehaviour
         }
 
         WriteText(str);
-
-        //StartCoroutine(MenuSelectLoop(menuLines));
     }
-
-    /*
-    IEnumerator MenuSelectLoop(string[] menuLines)
-    {
-        yield return null;
-        while (true)
-        {
-            if (Input.GetKeyDown(KeyCode.Keypad2))
-            {
-                MoveCursor(1);
-                DisplayMenu();
-                break;
-            }
-
-            if (Input.GetKeyDown(KeyCode.Keypad8))
-            {
-                MoveCursor(-1);
-                DisplayMenu();
-                break;
-            }
-
-            if (pressEnter)
-            {
-                string menu = mainMenuLines[cursorPos];
-
-                switch (menu)
-                {
-                    case "body info": StartCoroutine(BodyInfo()); break;
-                    case "play intro": StartCoroutine(PlayRecord(introRecord)); break;
-                    case "credits": Credits(); break;
-                    default: StartCoroutine(BodyInfo()); break;
-                }
-
-                yield break;
-            }
-
-            yield return null;
-        }
-        yield return null;
-
-    }*/
-
-    //public enum ScreenType { Menu, Record, Update }
-
-    /*
-    void TerminalUpdate()
-    {
-
-        string[] nextLines = null;
-
-        // navigate up
-
-        // navigate down
-
-        if (pressEnter)
-        {
-            ScreenType screenType = ScreenType.Menu;
-
-            switch (screenType)
-            {
-                case ScreenType.Menu:
-                    DisplayMenu(nextLines);
-                    break;
-                case ScreenType.Record:
-                    PlayRecord(manualLines);
-                    break;
-                case ScreenType.Update:
-                    StartCoroutine(BodyInfo());
-                    break;
-                default:
-                    break;
-            }
-        }
-    }*/
-
-    //ScreenType nextScreenType = ScreenType.Record;
-    //string[] nextScreenLines;
-    //string[] currentScreenLines;
 
     void TerminalMoveCursor(int by)
     {
@@ -546,20 +462,6 @@ public class CockpitMenu : MonoBehaviour
 
         // refresh terminal
         DisplayMenu(currentTerminalPage.lines);
-    }
-
-    [System.Obsolete("Use TermnalMoveCursor instead")]
-    void MoveCursor(int by)
-    {
-        menuCursorPos += by;
-
-        int maxPos = 6;
-
-        if (menuCursorPos > maxPos)
-            menuCursorPos = 0;
-
-        if (menuCursorPos < 0)
-            menuCursorPos = maxPos;
     }
 
     int atRecordPage;
@@ -600,67 +502,14 @@ public class CockpitMenu : MonoBehaviour
         WriteText(tp.lines[atRecordPage]);
         atRecordPage++;
     }
-
-    [System.Obsolete]
-    void DisplayMenu()
-    {
-        StopAllCoroutines();
-
-        string str = "";
-
-        WriteText(str);
-
-        StartCoroutine(MenuLoop());
-    }
-
-    [System.Obsolete]
-    IEnumerator MenuLoop()
-    {
-        yield return null;
-        while (true)
-        {
-            if (Input.GetKeyDown(KeyCode.Keypad2))
-            {
-                MoveCursor(1);
-                DisplayMenu();
-                break;
-            }
-
-            if (Input.GetKeyDown(KeyCode.Keypad8))
-            {
-                MoveCursor(-1);
-                DisplayMenu();
-                break;
-            }
-
-
-            yield return null;
-        }
-        yield return null;
-    }
-
-    [System.Obsolete]
-    IEnumerator ReturnToMainMenu()
-    {
-        yield return null;
-
-        while (!Input.GetKeyDown(KeyCode.KeypadEnter) && !Input.GetKeyDown(KeyCode.Return))
-        {
-            yield return null;
-        }
-
-        DisplayMenu();
-    }
-
-    //bool pressEnter;
+    
+    
 
     int menuCursorPos;
 
 
 
     string displayStr;
-
-
 
     IEnumerator BodyInfo()
     {
@@ -699,14 +548,6 @@ public class CockpitMenu : MonoBehaviour
             yield return new WaitForSeconds(5);
 
         }
-    }
-
-    [System.Obsolete]
-    void Credits()
-    {
-        StartCoroutine(ReturnToMainMenu());
-
-        WriteText("Made by:\nIvan Notaros Nothke\n\nMusic by\nMartin Kvale\n\nShader mage\nLeon Denise");
     }
 
     void WriteText(string inStr)
