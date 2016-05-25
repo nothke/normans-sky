@@ -408,6 +408,9 @@ public class CockpitMenu : MonoBehaviour
 
         if (tp.type == TerminalPage.Type.Record)
             NextRecordPage();
+
+        if (tp.type == TerminalPage.Type.Update)
+            StartCoroutine(BodyInfo());
     }
 
     public TerminalPage GetTerminalPage(string key)
@@ -417,8 +420,6 @@ public class CockpitMenu : MonoBehaviour
             if (t.name == key)
                 return t;
         }
-
-        Debug.Log("Unknown Page");
 
         return null;
     }
@@ -478,7 +479,7 @@ public class CockpitMenu : MonoBehaviour
                 NextRecordPage();
                 break;
             case TerminalPage.Type.Update:
-                StartCoroutine(BodyInfo());
+                DisplayTerminalPage("MAIN");
                 break;
             case TerminalPage.Type.Terminator:
                 DisplayTerminalPage(terminalPages[1]); // DIRTY - pointing to main menu
