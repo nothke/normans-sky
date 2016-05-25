@@ -3,6 +3,7 @@ using System.Collections;
 using DG.Tweening;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System;
 
 public class CockpitMenu : MonoBehaviour
 {
@@ -57,7 +58,7 @@ public class CockpitMenu : MonoBehaviour
             case Module.Navigation:
                 break;
             case Module.NormanTerminal:
-                TerminalMoveCursor(by);
+                TerminalMoveCursor(-by);
                 break;
             default:
                 break;
@@ -153,7 +154,7 @@ public class CockpitMenu : MonoBehaviour
 
 
 
-    
+
 
     #endregion
 
@@ -322,7 +323,6 @@ public class CockpitMenu : MonoBehaviour
             TerminalPage.Type.Menu,
             new string[]
             {
-                "REC",
                 "Systems module:\n" +
                 "1.BATT - on\n" +
                 "2.FUEL - on\n" +
@@ -335,16 +335,54 @@ public class CockpitMenu : MonoBehaviour
             "CHECKLISTS"));
 
         terminalPages.Add(new TerminalPage(
-    "SHUT DOWN",
-    TerminalPage.Type.Menu,
-    new string[]
-    {
-                "REC",
+            "SHUT DOWN",
+            TerminalPage.Type.Menu,
+            new string[]
+            {
                 "Systems module:\n" +
                 "1.FUEL - cut\n" +
                 "1.BATT - off\n"
-    },
-    "CHECKLISTS"));
+            },
+            "CHECKLISTS"));
+
+
+        terminalPages.Add(new TerminalPage(
+            "EXCEPTION",
+            TerminalPage.Type.Record,
+            new string[]
+            {
+                "8888\nUnknown or unimplemented feature\n8888",
+            },
+            "MAIN"));
+    }
+
+    public Text normanText;
+
+    TerminalPage currentTerminalPage;
+
+    public void DisplayTerminalPage(string pageKey)
+    {
+        DisplayTerminalPage(GetTerminalPage(pageKey));
+    }
+
+    public void DisplayTerminalPage(TerminalPage tp)
+    {
+        if (tp == null)
+        {
+            DisplayErrorPage(); //TODO
+            return;
+        }
+
+        currentTerminalPage = tp;
+
+        if (tp.type == TerminalPage.Type.Menu)
+            DisplayMenu(tp.lines);
+
+        if (tp.type == TerminalPage.Type.Record)
+        {
+
+        }
+
     }
 
     public TerminalPage GetTerminalPage(string key)
@@ -360,30 +398,12 @@ public class CockpitMenu : MonoBehaviour
         return null;
     }
 
-    public Text normanText;
-
-    TerminalPage currentTerminalPage;
-
-    public void DisplayTerminalPage(TerminalPage tp)
-    {
-        if (tp == null)
-            DisplayErrorPage(); //TODO
-
-        currentTerminalPage = tp;
-
-        if (tp.type == TerminalPage.Type.Menu)
-            DisplayMenu(tp.lines);
-
-        if (tp.type == TerminalPage.Type.Record)
-        {
-
-        }
-
-    }
-
     void DisplayErrorPage()
     {
-
+        if (GetTerminalPage("EXCEPTION") != null)
+            DisplayTerminalPage("EXCEPTION");
+        else
+            Debug.LogError("EXCEPTION page doesn't exist but MUST!");
     }
 
     [System.Obsolete]
@@ -408,13 +428,13 @@ public class CockpitMenu : MonoBehaviour
 
     void DisplayMenu(string[] menuLines)
     {
-        StopAllCoroutines();
+        StopAllCoroutines(); // DIRTY
 
         string str = "";
 
         for (int i = 0; i < menuLines.Length; i++)
         {
-            if (i == cursorPos)
+            if (i == menuCursorPos)
                 str += "8";
             else
                 str += " ";
@@ -510,10 +530,10 @@ public class CockpitMenu : MonoBehaviour
         if (currentTerminalPage.type != TerminalPage.Type.Menu)
             return;
 
-        cursorPos += by;
+        menuCursorPos += by;
 
-        int maxPos = mainMenuLines.Length - 1;
-        cursorPos = Repeat(cursorPos, by);
+        int maxPos = currentTerminalPage.lines.Length - 1;
+        menuCursorPos = Repeat(menuCursorPos, maxPos);
 
         // refresh terminal
         DisplayMenu(currentTerminalPage.lines);
@@ -522,15 +542,15 @@ public class CockpitMenu : MonoBehaviour
     [System.Obsolete("Use TermnalMoveCursor instead")]
     void MoveCursor(int by)
     {
-        cursorPos += by;
+        menuCursorPos += by;
 
-        int maxPos = mainMenuLines.Length - 1;
+        int maxPos = 6;
 
-        if (cursorPos > maxPos)
-            cursorPos = 0;
+        if (menuCursorPos > maxPos)
+            menuCursorPos = 0;
 
-        if (cursorPos < 0)
-            cursorPos = maxPos;
+        if (menuCursorPos < 0)
+            menuCursorPos = maxPos;
     }
 
     int atRecordPage;
@@ -540,7 +560,7 @@ public class CockpitMenu : MonoBehaviour
         switch (currentTerminalPage.type)
         {
             case TerminalPage.Type.Menu:
-                DisplayTerminalPage(GetTerminalPage(currentTerminalPage.lines[atRecordPage]));
+                DisplayTerminalPage(currentTerminalPage.lines[menuCursorPos]);
                 atRecordPage = 0;
                 break;
             case TerminalPage.Type.Record:
@@ -555,13 +575,15 @@ public class CockpitMenu : MonoBehaviour
             default:
                 break;
         }
+
+        menuCursorPos = 0;
     }
 
     void NextRecordPage()
     {
         TerminalPage tp = currentTerminalPage;
 
-        if (atRecordPage >= tp.lines.Length + 1)
+        if (atRecordPage >= tp.lines.Length - 1)
         {
             DisplayTerminalPage(GetTerminalPage(tp.next));
             return;
@@ -577,16 +599,6 @@ public class CockpitMenu : MonoBehaviour
         StopAllCoroutines();
 
         string str = "";
-
-        for (int i = 0; i < mainMenuLines.Length; i++)
-        {
-            if (i == cursorPos)
-                str += "8";
-            else
-                str += " ";
-
-            str += mainMenuLines[i] + "\n";
-        }
 
         WriteText(str);
 
@@ -613,26 +625,13 @@ public class CockpitMenu : MonoBehaviour
                 break;
             }
 
-            if (pressEnter)
-            {
-                string menu = mainMenuLines[cursorPos];
-
-                switch (menu)
-                {
-                    case "body info": StartCoroutine(BodyInfo()); break;
-                    //case "play intro": StartCoroutine(PlayRecord(introRecord)); break;
-                    case "credits": Credits(); break;
-                    default: StartCoroutine(BodyInfo()); break;
-                }
-
-                yield break;
-            }
 
             yield return null;
         }
         yield return null;
     }
 
+    [System.Obsolete]
     IEnumerator ReturnToMainMenu()
     {
         yield return null;
@@ -645,9 +644,9 @@ public class CockpitMenu : MonoBehaviour
         DisplayMenu();
     }
 
-    bool pressEnter;
+    //bool pressEnter;
 
-    int cursorPos;
+    int menuCursorPos;
 
 
 
@@ -657,7 +656,7 @@ public class CockpitMenu : MonoBehaviour
 
     IEnumerator BodyInfo()
     {
-        StartCoroutine(ReturnToMainMenu());
+        //StartCoroutine(ReturnToMainMenu());
 
         while (true)
         {
@@ -694,41 +693,13 @@ public class CockpitMenu : MonoBehaviour
         }
     }
 
+    [System.Obsolete]
     void Credits()
     {
         StartCoroutine(ReturnToMainMenu());
 
         WriteText("Made by:\nIvan Notaros Nothke\n\nMusic by\nMartin Kvale\n\nShader mage\nLeon Denise");
     }
-
-    string[] mainMenuLines = {
-        "MENU",
-        "body info",
-        "plane",
-        "mission",
-        "play intro",
-        "controls",
-        "manual",
-        "checklists",
-        "credits"
-    };
-
-    string[] manualLines =
-    {
-        "MENU",
-        "startup",
-        "flight",
-        "systems",
-        "navigation"
-    };
-
-    string[] checklists =
-    {
-        "MENU",
-        "start up",
-        "shut down",
-        "approach"
-    };
 
     void WriteText(string inStr)
     {
