@@ -12,7 +12,7 @@ public class Motion : MonoBehaviour
 {
     public static Motion e;
 
-
+    public LayerMask worldLayer;
 
     public List<Transform> chunks = new List<Transform>();
     public float shiftRange = 10;
@@ -35,7 +35,7 @@ public class Motion : MonoBehaviour
     private float originalAngularDrag;
     private float originalDrag;
 
-    public PlanetEntity currentPlanet;
+    public CelestialBody currentBody;
 
     public ParticleSystem speedticle;
 
@@ -80,7 +80,7 @@ public class Motion : MonoBehaviour
 
     void Awake() { e = this; }
 
-    Rigidbody rb;
+    public Rigidbody rb;
 
     public float velocity;
     public float altitude;
@@ -93,6 +93,7 @@ public class Motion : MonoBehaviour
         originalDrag = GetComponent<Rigidbody>().drag;
 
         rb = GetComponent<Rigidbody>();
+        CelestialGravity.sceneRigidbodies.Add(rb);
     }
 
     void ShiftOrigin()
@@ -146,16 +147,49 @@ public class Motion : MonoBehaviour
     public float mainEngineVelo;
     public float hyperVelo;
 
+    float bodySqrDistance;
+    float bodyVSpeed;
+    float bodyHSpeed;
 
     void Update()
     {
+
+
+
+
         velocity = rb.velocity.magnitude;
         Vector3 localVelocity = transform.InverseTransformDirection(rb.velocity);
 
+
+        if (CockpitMenu.e)
+        {
+            Ray proxRay = new Ray(transform.position, rb.velocity);
+
+            Debug.DrawRay(proxRay.origin, rb.velocity);
+
+            if (velocity > 10 && Physics.Raycast(proxRay, velocity * 2, worldLayer))
+            {
+                CockpitMenu.e.DisplayWarning("PROX");
+            }
+            else CockpitMenu.e.EndWarning("PROX");
+        }
+
         altitude = 100000;
 
-        if (currentPlanet)
-            altitude = Vector3.Distance(transform.position, currentPlanet.transform.position) - currentPlanet.radius;
+
+
+        SetClosestBody();
+
+        if (currentBody)
+        {
+            altitude = Vector3.Distance(transform.position, currentBody.transform.position) - currentBody.radius;
+            Vector3 bodyNormal = currentBody.transform.position - transform.position;
+            bodySqrDistance = bodyNormal.sqrMagnitude;
+            bodyVSpeed = Vector3.Dot(bodyNormal.normalized, rb.velocity);
+            bodyHSpeed = Vector3.ProjectOnPlane(rb.velocity, bodyNormal).magnitude;
+        }
+
+        PlanetEntity currentPlanet = currentBody as PlanetEntity;
 
         if (currentPlanet && currentPlanet.atmosphere)
         {
@@ -167,7 +201,7 @@ public class Motion : MonoBehaviour
 
                 if (altitude < currentPlanet.atmosphereHeight)
                 {
-                    Vector3 normalDir = Vector3.Normalize(transform.position - currentPlanet.transform.position);
+                    Vector3 normalDir = Vector3.Normalize(transform.position - currentBody.transform.position);
 
                     //var localVelocity = transform.InverseTransformDirection(rb.velocity);
                     float ForwardSpeed = Mathf.Max(0, localVelocity.z);
@@ -252,80 +286,113 @@ public class Motion : MonoBehaviour
         else
         {
             float airFactor = Mathf.Clamp(1 - airDensity, 0.25f, 1);
-
-
             rb.angularDrag = originalAngularDrag * (1 + airDensity) * (1 + speedFactor);
-
-
             force = translateForce * airFactor;
-
-            //Debug.Log(airFactor);
         }
-
 
 
         if (Input.GetKey(KeyCode.Space))
-            GetComponent<Rigidbody>().drag = 1;
+            rb.drag = 1;
         else
-            GetComponent<Rigidbody>().drag = originalDrag;
+            rb.drag = originalDrag;
 
-        GetComponent<Rigidbody>().AddForce(Input.GetAxis("Vertical") * transform.up * Time.deltaTime * force * (1 + airDensity * 2));
-        GetComponent<Rigidbody>().AddForce(Input.GetAxis("Horizontal") * transform.right * Time.deltaTime * force);
-        GetComponent<Rigidbody>().AddForce(Input.GetAxis("Forward") * transform.forward * Time.deltaTime * force);
+        Vector3 trnInput = new Vector3(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"), Input.GetAxis("Forward"));
+        Vector3 rotInput = new Vector3(Input.GetAxis("Pitch"), Input.GetAxis("Roll"), Input.GetAxis("Yaw"));
 
-
-
-        float torqueMult = rotationForce * (1 + 5 * airDensity) * (1 + speedFactor) * Time.deltaTime;
-        //Debug.Log(torqueMult);
-
-        GetComponent<Rigidbody>().AddTorque(Input.GetAxis("Roll") * transform.forward * torqueMult, ForceMode.Acceleration);
-        GetComponent<Rigidbody>().AddTorque(Input.GetAxis("Yaw") * transform.up * torqueMult, ForceMode.Acceleration);
-        GetComponent<Rigidbody>().AddTorque(Input.GetAxis("Pitch") * transform.right * torqueMult, ForceMode.Acceleration);
-
-        float rcsTarget = 0;
-        float mainEngineTarget = 0;
-
-        ShipSystems.e.FireRCS(Input.GetAxis("Forward"), Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"),
-            Input.GetAxis("Roll"), Input.GetAxis("Pitch"), Input.GetAxis("Yaw"));
-
-        if (Input.GetAxis("Roll") != 0 || Input.GetAxis("Yaw") != 0 || Input.GetAxis("Pitch") != 0 || Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+        if (ShipSystems.e.totalEnginePower > 0)
         {
-            //rb.angularDrag = 1;
 
-            if (airDensity == 0)
-                rcsTarget = 1;
+            float forceMult = force * Time.deltaTime;
+            float upExtraMult = 1 + airDensity * 2;
+
+            rb.AddForce(trnInput.x * transform.up * forceMult * upExtraMult);
+            rb.AddForce(trnInput.y * transform.right * forceMult);
+            rb.AddForce(trnInput.z * transform.forward * forceMult);
+
+            float torqueMult = rotationForce * (1 + 5 * airDensity) * (1 + speedFactor) * Time.deltaTime;
+
+            rb.AddTorque(rotInput.x * transform.right * torqueMult, ForceMode.Acceleration);
+            rb.AddTorque(rotInput.y * transform.forward * torqueMult, ForceMode.Acceleration);
+            rb.AddTorque(rotInput.z * transform.up * torqueMult, ForceMode.Acceleration);
+
+
+            float rcsTarget = 0;
+            float mainEngineTarget = 0;
+
+            ShipSystems.e.FireRCS(trnInput.z, trnInput.y, trnInput.x, rotInput.y, rotInput.x, rotInput.z);
+
+            if (trnInput != Vector3.zero || rotInput != Vector3.zero)
+            {
+                if (airDensity == 0)
+                    rcsTarget = 1;
+            }
+
+            float mainEngineThrottle = Mathf.Clamp01(Input.GetAxis("Forward"));
+
+            ShipSystems.e.SetMainEngineTargetPower(mainEngineThrottle);
+
+            if (Input.GetAxis("Forward") != 0)
+                mainEngineTarget = 1;
+
+            // engine audios
+            rcsAudio.volume = Mathf.SmoothDamp(rcsAudio.volume, rcsTarget, ref rcsAudioVelo, 0.1f);
+            mainEngineAudio.volume = Mathf.SmoothDamp(mainEngineAudio.volume, mainEngineTarget, ref mainEngineVelo, 0.1f);
+            hyperAudio.volume = Mathf.SmoothDamp(hyperAudio.volume, hyperTarget, ref hyperVelo, 0.1f);
         }
-
-        float mainEngineThrottle = Mathf.Clamp01(Input.GetAxis("Forward"));
-
-        ShipSystems.e.SetMainEngineTargetPower(mainEngineThrottle);
-
-        if (Input.GetAxis("Forward") != 0)
-            mainEngineTarget = 1;
-
-        rcsAudio.volume = Mathf.SmoothDamp(rcsAudio.volume, rcsTarget, ref rcsAudioVelo, 0.1f);
-        mainEngineAudio.volume = Mathf.SmoothDamp(mainEngineAudio.volume, mainEngineTarget, ref mainEngineVelo, 0.1f);
-        hyperAudio.volume = Mathf.SmoothDamp(hyperAudio.volume, hyperTarget, ref hyperVelo, 0.1f);
 
         if (airDensity < 0.5f)
             speedticle.SetEmissionRate(Mathf.Clamp(velocity - 40, 0, 200));
         else
             speedticle.SetEmissionRate(0);
 
-        //DebugAxes();
+
 
 
 
         UpdateShift();
 
+        //DebugAxes();
         //Output();
 
-
-
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.Tab)) // TODO: Move this to app control
             Application.LoadLevel(0);
 
 
+    }
+
+    public List<CelestialBody> closeBodies = new List<CelestialBody>();
+
+    public void AddBody(CelestialBody p)
+    {
+        if (closeBodies.Contains(p)) return;
+        else closeBodies.Add(p);
+    }
+
+    public void RemoveBody(CelestialBody p)
+    {
+        closeBodies.Remove(p);
+
+        closeBodies.RemoveAll(item => item == null);
+    }
+
+    public void SetClosestBody()
+    {
+        float sqrDist = Mathf.Infinity;
+
+        if (closeBodies.Count == 0)
+        {
+            currentBody = null;
+        }
+        else
+        {
+            foreach (var body in closeBodies)
+            {
+                float dist = (body.transform.position - transform.position).magnitude;
+
+                if (dist < sqrDist)
+                    currentBody = body;
+            }
+        }
     }
 
     void UpdateShift()
@@ -399,18 +466,38 @@ public class Motion : MonoBehaviour
 
         GUILayout.Space(5);
 
-        if (currentPlanet)
+        if (currentBody)
         {
-            GUILayout.Label("Body: " + currentPlanet.name, guiStyle);
+            GUILayout.Label("Body: " + currentBody.name, guiStyle);
+
+            PlanetEntity currentPlanet = currentBody as PlanetEntity;
+
+            if (currentPlanet != null)
+            {
+                string type = currentPlanet.type == PlanetEntity.Type.Rocky ? "Rocky Planet" : "Gas Giant";
+                GUILayout.Label("Type: " + type, guiStyle);
+            }
+            else
+            {
+                GUILayout.Label("Type: Star", guiStyle);
+            }
 
             //string type = currentPlanet
             //GUILayout.Label("Type: " + currentPlanet.name, guiStyle);
 
+            GUILayout.Label("radius: " + currentBody.radius, guiStyle);
+            if (currentPlanet != null) GUILayout.Label("atmosH: " + currentPlanet.atmosphereHeight.ToString("F2"), guiStyle);
+            //GUILayout.Label("gravF:  " + currentBody.gravity.force.ToString("F2"), guiStyle);
+            if (currentPlanet != null) GUILayout.Label("airDns: " + airDensity.ToString("F2"), guiStyle);
+            GUILayout.Label("altitd: " + altitude.ToString("F2"), guiStyle);
+            GUILayout.Label("distnc: " + Mathf.Sqrt(bodySqrDistance).ToString("F2"), guiStyle);
+            GUILayout.Label("vSpeed: " + bodyVSpeed.ToString("F2"), guiStyle);
+            GUILayout.Label("hSpeed: " + bodyHSpeed.ToString("F2"), guiStyle);
+            float orbitHV = CelestialGravity.CalculateVelocityForCircularOrbit(1, bodySqrDistance); // TODO: change to earth masses
+            GUILayout.Label("orbitV: " + orbitHV.ToString("F2"), guiStyle);
 
-            GUILayout.Label("radius: " + currentPlanet.radius, guiStyle);
-            GUILayout.Label("atmosH: " + currentPlanet.atmosphereHeight, guiStyle);
-            GUILayout.Label("gravF:  " + currentPlanet.gravity.force.ToString("F2"), guiStyle);
-            GUILayout.Label("airDns: " + airDensity.ToString("F2"), guiStyle);
+            float surfGrav = CelestialGravity.GetAcceleration(currentBody.mass, currentBody.radius * currentBody.radius);
+            GUILayout.Label("srfAcc: " + surfGrav.ToString("F2"), guiStyle);
         }
         else
             GUILayout.Label("Body: None in range", guiStyle);

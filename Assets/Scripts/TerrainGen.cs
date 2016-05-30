@@ -19,6 +19,23 @@ public class TerrainGen : MonoBehaviour
         Deform();
     }
 
+    void TimeDeform()
+    {
+        float tTest = Time.realtimeSinceStartup; // TEST TIMER
+
+        Deform();
+
+        Debug.Log("Mesh gen: " + (Time.realtimeSinceStartup - tTest)); // TEST TIMER
+
+        float tTest1 = Time.realtimeSinceStartup; // TEST TIMER
+
+        AddCollider();
+
+        Debug.Log("Collider making: " + (Time.realtimeSinceStartup - tTest1)); // TEST TIMER
+
+
+    }
+
     void Deform()
     {
         MeshFilter mf = GetComponent<MeshFilter>();
@@ -42,9 +59,20 @@ public class TerrainGen : MonoBehaviour
         mf.mesh.RecalculateNormals();
     }
 
+    void AddCollider()
+    {
+        MeshFilter mf = GetComponent<MeshFilter>();
+
+        MeshCollider col = GetComponent<MeshCollider>();
+        if (col == null) col = gameObject.AddComponent<MeshCollider>();
+
+
+        col.sharedMesh = mf.mesh;
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.H))
-            Deform();
+            TimeDeform();
     }
 }

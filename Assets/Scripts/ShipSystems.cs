@@ -47,6 +47,9 @@ public class ShipSystems : MonoBehaviour
 
     public GameObject[] rcsLeds;
 
+    public bool autoStartOnStart;
+
+
     public enum RCSMotion { Forward, Back, Left, Right, Up, Down, RollLeft, RollRight, PitchUp, PitchDown, YawLeft, YawRight }
 
     public void FireRCS(float forward, float vertical, float horizontal, float roll, float pitch, float yaw)
@@ -128,9 +131,34 @@ public class ShipSystems : MonoBehaviour
 
         for (int i = 0; i < engines.Length; i++)
             engines[i] = new Engine();
+
+        if (autoStartOnStart)
+            StartCoroutine(AutoStart());
+
+    }
+
+    IEnumerator AutoStart()
+    {
+        SetBattery(1);
+        SetFuel(1);
+        SetPump(1);
+
+        yield return new WaitForSeconds(1);
+
+        EngineIgnition(0);
+
+        yield return new WaitForSeconds(0.1f);
+        SetPump(0);
+
+        yield return new WaitForSeconds(2);
+
+        EngineIgnition(1);
+        EngineIgnition(2);
     }
 
     bool prevPower;
+
+    public float totalEnginePower;
 
     void Update()
     {
@@ -163,13 +191,23 @@ public class ShipSystems : MonoBehaviour
         if (power != prevPower)
             PowerChange();
 
+        totalEnginePower = 0;
+
         foreach (var engine in engines)
         {
-            if (!engine.isOn) engine.targetPower = 0;
-            else
+            if (engine.isOn)
+            {
                 fuelFlow = 3000;
+                engine.targetPower = 0.1f;
+            }
+            else
+            {
+                engine.targetPower = 0;
+            }
 
             engine.power = Mathf.SmoothDamp(engine.power, engine.targetPower, ref engine.powerRefVelo, Engine.smoothingTime);
+
+            totalEnginePower += engine.power;
         }
 
         prevPower = power;
@@ -259,7 +297,7 @@ public class ShipSystems : MonoBehaviour
         {
             engines[i].isOn = true;
             SetRCSLedColor(Color.green, false);
-            AddLoad(-0.2f, 3);
+            AddLoad(-0.2f, 2);
             Debug.Log("Engine " + i + ": Ignition success");
         }
         else
@@ -292,4 +330,7 @@ public class ShipSystems : MonoBehaviour
     {
         fuelFlow = 0.01f * value;
     }
+    
+
+
 }

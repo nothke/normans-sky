@@ -22,6 +22,8 @@ public class CockpitMenu : MonoBehaviour
 
     public Transform cockpitHUD;
 
+    public Text warningHUD;
+
     public enum Module
     {
         Cockpit,
@@ -92,6 +94,74 @@ public class CockpitMenu : MonoBehaviour
         }
     }
 
+    [Serializable]
+    public class Warning
+    {
+        public string name;
+        public bool isOn;
+        public Color color = Color.red;
+    }
+
+    public Warning[] warnings;
+
+    List<Warning> currentWarnings = new List<Warning>();
+
+    public void DisplayWarning(string warningName)
+    {
+        Warning w = null;
+
+        foreach (var warning in warnings)
+        {
+            if (warning.name == warningName)
+                w = warning;
+        }
+
+        if (w == null)
+            return;
+
+        if (currentWarnings.Contains(w))
+            return;
+
+        currentWarnings.Add(w);
+    }
+
+    public void EndWarning(string warningName)
+    {
+        for (int i = 0; i < currentWarnings.Count; i++)
+        {
+            if (currentWarnings[i].name == warningName)
+            {
+                currentWarnings.RemoveAt(i);
+                return;
+            }
+        }
+    }
+
+    public IEnumerator WarningCo()
+    {
+
+
+        while (true)
+        {
+
+            if (currentWarnings.Count > 0)
+                for (int i = 0; i < currentWarnings.Count; i++)
+                {
+                    warningHUD.text = currentWarnings[i].name;
+                    warningHUD.color = currentWarnings[i].color;
+                    yield return new WaitForSeconds(1);
+                }
+            else
+                warningHUD.text = null;
+
+            yield return null;
+
+
+        }
+        
+
+    }
+
     public Transform selector;
     int sysSelAt;
     public HUDSwitch[] sysSwitches;
@@ -114,6 +184,8 @@ public class CockpitMenu : MonoBehaviour
         InitTerminalPages();
 
         DisplayTerminalPage(terminalPages[0]);
+
+        StartCoroutine(WarningCo());
     }
 
     public void Update()
@@ -121,6 +193,21 @@ public class CockpitMenu : MonoBehaviour
         ReadInput();
 
         UpdateGauges();
+
+        if (Input.GetKeyDown("n"))
+        {
+            DisplayWarning("PROX");
+        }
+
+        if (Input.GetKeyDown("b"))
+        {
+            DisplayWarning("FUEL");
+        }
+
+        if (Input.GetKeyDown("m"))
+        {
+            EndWarning("PROX");
+        }
     }
 
     void ReadInput()
@@ -522,7 +609,7 @@ public class CockpitMenu : MonoBehaviour
 
             //    GUILayout.Label("Sector " + su.curSectorX + ", " + su.curSectorY + ", " + su.curSectorZ, guiStyle);
 
-            PlanetEntity currentPlanet = Motion.e.currentPlanet;
+            PlanetEntity currentPlanet = Motion.e.currentBody as PlanetEntity; // TODO
 
             if (currentPlanet)
             {

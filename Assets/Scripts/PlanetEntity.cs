@@ -12,6 +12,9 @@ public class PlanetEntity : CelestialBody
 
     public Transform atmoSphereSphere;
 
+    public enum Type { Rocky, GasGiant };
+    public Type type = Type.Rocky;
+
     void OnDrawGizmos()
     {
         if (atmosphere)
