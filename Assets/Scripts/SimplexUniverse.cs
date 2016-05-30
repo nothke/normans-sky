@@ -43,7 +43,14 @@ public class SimplexUniverse : MonoBehaviour
     [Header("System properties")]
     public int maxPlanets = 10;
     public float minPlanetRange = 5;
+    public float minPlanetSeparation = 5;
+    public float nextPlanetPower = 2;
     public float maxPlanetRangeMult = 50;
+
+    public float minPlanetRadius = 500;
+    public float maxPlanetRadius = 2000;
+
+    public float gasGiantThreshold = 1500;
 
     [Header("Generator Prefabs")]
     public bool generate = false;
@@ -95,6 +102,7 @@ public class SimplexUniverse : MonoBehaviour
         public Color starColor;
 
         public float[] planetOrbits;
+        public float[] planetRadii;
         public Vector3[] planetPositions;
         public Color[] planetColors;
 
@@ -320,7 +328,19 @@ public class SimplexUniverse : MonoBehaviour
                     GameObject planetGO = Instantiate(planetPrefab, sectorStartPos + sector.planetPositions[i], Quaternion.identity) as GameObject;
                     if (Motion.e) Motion.e.chunks.Add(planetGO.transform);
 
-                    sector.star[0].planets[i] = planetGO.GetComponent<PlanetEntity>();
+                    PlanetEntity planet = planetGO.GetComponent<PlanetEntity>();
+
+                    planet.radius = Random.Range(minPlanetRadius, maxPlanetRadius);
+
+                    if (planet.radius < gasGiantThreshold)
+                    {
+                        planet.type = PlanetEntity.Type.GasGiant;
+
+                        if (Random.value < 0.5f)
+                            planet.GetComponent<RingMaker>().enabled = true;
+                    }
+
+                    sector.star[0].planets[i] = planet;
                     if (!sector.star[0].planets[i]) Debug.LogWarning("PlanetEntity not found");
                 }
             }
@@ -394,17 +414,19 @@ public class SimplexUniverse : MonoBehaviour
         s.planetOrbits = new float[planetsNum];
         s.planetPositions = new Vector3[planetsNum];
         s.planetColors = new Color[planetsNum];
+        s.planetRadii = new float[planetsNum];
 
-        float orbitRadius = 0;
+        float orbitRadius = minPlanetRange;
 
         for (int i = 0; i < planetsNum; i++)
         {
-            orbitRadius += Random.Range(minPlanetRange, minPlanetRange * 2 * (i + 1));
+            orbitRadius += Random.Range(minPlanetSeparation, minPlanetSeparation * (Mathf.Pow(i + 1, nextPlanetPower)));
             s.planetOrbits[i] = orbitRadius;
 
             Vector3 pos = RandomPointOnPlane(s.orbitNormal, orbitRadius);
 
             s.planetPositions[i] = s.starPostion + pos;
+            s.planetRadii[i] = Random.Range(minPlanetRadius, maxPlanetRadius);
             s.planetColors[i] = planetColorGradient.Evaluate(Random.value);
         }
     }
@@ -533,7 +555,7 @@ public class SimplexUniverse : MonoBehaviour
                         for (int i = 0; i < sector.planetPositions.Length; i++)
                         {
                             Gizmos.color = sector.planetColors[i];
-                            Gizmos.DrawSphere(sectorStartPos + sector.planetPositions[i], planetPreviewRadius);
+                            Gizmos.DrawSphere(sectorStartPos + sector.planetPositions[i], sector.planetRadii[i]); // planetPreviewRadius
 
 
                             if (drawOrbits)
