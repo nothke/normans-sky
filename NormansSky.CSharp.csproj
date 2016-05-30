@@ -90,6 +90,7 @@
     <Compile Include="Assets\Scripts\CockpitMenu.cs" />
     <Compile Include="Assets\Scripts\Example.cs" />
     <Compile Include="Assets\Scripts\HUDSwitch.cs" />
+    <Compile Include="Assets\Scripts\MainControl.cs" />
     <Compile Include="Assets\Scripts\Menu.cs" />
     <Compile Include="Assets\Scripts\Motion.cs" />
     <Compile Include="Assets\Scripts\Move.cs" />

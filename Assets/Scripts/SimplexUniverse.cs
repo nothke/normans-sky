@@ -64,6 +64,8 @@ public class SimplexUniverse : MonoBehaviour
     public string[] namePrefixes;
     public string[] nameSuffixes;
 
+    public bool initOnStart;
+
     void Awake()
     {
         e = this;
@@ -71,9 +73,12 @@ public class SimplexUniverse : MonoBehaviour
 
     void Start()
     {
-        CreateAllSectors();
+        if (initOnStart)
+        {
+            CreateAllSectors();
 
-        GeneratePhysical();
+            GeneratePhysical();
+        }
     }
 
     void UpdateNames()
@@ -123,7 +128,7 @@ public class SimplexUniverse : MonoBehaviour
         return sectorRadius * 2 + 1;
     }
 
-    void CreateAllSectors()
+    public void CreateAllSectors()
     {
         sectorRange = GetSectorRange();
 
@@ -285,7 +290,7 @@ public class SimplexUniverse : MonoBehaviour
 
     }
 
-    void GeneratePhysical()
+    public void GeneratePhysical()
     {
         if (!generate) return;
 

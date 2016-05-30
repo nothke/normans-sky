@@ -38,6 +38,7 @@ public class Motion : MonoBehaviour
     public CelestialBody currentBody;
 
     public ParticleSystem speedticle;
+    public ParticleSystem rainParticles;
 
     /*
     public struct PositionDouble
@@ -154,7 +155,7 @@ public class Motion : MonoBehaviour
     void Update()
     {
 
-
+        
 
 
         velocity = rb.velocity.magnitude;
@@ -196,6 +197,10 @@ public class Motion : MonoBehaviour
             if (worldCamera)
             {
                 //float altitude = Vector3.Distance(transform.position, currentPlanet.transform.position) - currentPlanet.radius;
+
+                rainParticles.transform.parent.LookAt(currentPlanet.transform.position);
+
+
 
 
 
@@ -247,6 +252,8 @@ public class Motion : MonoBehaviour
                     float percent = 1 - ((altitude / currentPlanet.atmosphereHeight));
                     airDensity = percent;
 
+                    rainParticles.SetEmissionRate(airDensity * 4000);
+
                     worldCamera.backgroundColor = Color.Lerp(Color.black, currentPlanet.atmosphereColor, percent);
                     RenderSettings.fogDensity = (percent * percent) / 100;
 
@@ -259,6 +266,7 @@ public class Motion : MonoBehaviour
                     worldCamera.backgroundColor = Color.black;
                     RenderSettings.fog = false;
                     airDensity = 0;
+                    rainParticles.SetEmissionRate(0);
                 }
             }
         }

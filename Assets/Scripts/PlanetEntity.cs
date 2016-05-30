@@ -15,6 +15,10 @@ public class PlanetEntity : CelestialBody
     public enum Type { Rocky, GasGiant };
     public Type type = Type.Rocky;
 
+    public bool rain;
+    public bool thunder;
+    public bool snow;
+
     void OnDrawGizmos()
     {
         if (atmosphere)
