@@ -364,11 +364,6 @@ public class Motion : MonoBehaviour
 
         //DebugAxes();
         //Output();
-
-        if (Input.GetKeyDown(KeyCode.Tab)) // TODO: Move this to app control
-            Application.LoadLevel(0);
-
-
     }
 
     public List<CelestialBody> closeBodies = new List<CelestialBody>();

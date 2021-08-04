@@ -7,8 +7,7 @@ public static class ParticleUtils
     public static void SetEmissionRate(this ParticleSystem particleSystem, float rate)
     {
         ParticleSystem.EmissionModule em = particleSystem.emission;
-        ParticleSystem.MinMaxCurve rCurve = new ParticleSystem.MinMaxCurve(rate);
-        em.rate = rCurve;
+        em.rateOverTime = rate;
     }
 
     // needs testing

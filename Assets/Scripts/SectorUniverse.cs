@@ -394,10 +394,12 @@ public class SectorUniverse : MonoBehaviour
         int y = s.coordinate.y;
         int z = s.coordinate.z;
 
+        var randState = Random.state;
+
         float value = simplex.coherentNoise(x, y, z, octaves, multiplier, amplitude, lacunarity, persistence);
         value += 0.5f;
 
-        Random.seed = ("ad" + x + "_" + y + "_" + z).GetHashCode();
+        Random.InitState(("ad" + x + "_" + y + "_" + z).GetHashCode());
 
         if (value < systemProbability) // has no solar system
             return;
@@ -436,6 +438,8 @@ public class SectorUniverse : MonoBehaviour
             s.planetRadii[i] = Random.Range(minPlanetRadius, maxPlanetRadius);
             s.planetColors[i] = planetColorGradient.Evaluate(Random.value);
         }
+
+        Random.state = randState;
     }
 
     void DestroySystem(StarEntity[] stars)

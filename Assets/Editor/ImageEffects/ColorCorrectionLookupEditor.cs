@@ -48,10 +48,12 @@ namespace UnityStandardAssets.ImageEffects
                     string path = AssetDatabase.GetAssetPath (tex);
                     TextureImporter textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
                     bool doImport = textureImporter.isReadable == false;
+
                     if (textureImporter.mipmapEnabled == true) {
                         doImport = true;
                     }
-                    if (textureImporter.textureFormat != TextureImporterFormat.AutomaticTruecolor) {
+                    
+                    if (textureImporter.textureCompression != TextureImporterCompression.Uncompressed) {
                         doImport = true;
                     }
 
@@ -59,7 +61,8 @@ namespace UnityStandardAssets.ImageEffects
                     {
                         textureImporter.isReadable = true;
                         textureImporter.mipmapEnabled = false;
-                        textureImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+                        //textureImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+                        textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
                         AssetDatabase.ImportAsset (path, ImportAssetOptions.ForceUpdate);
                         //tex = AssetDatabase.LoadMainAssetAtPath(path);
                     }

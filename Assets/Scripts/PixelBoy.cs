@@ -9,14 +9,7 @@ public class PixelBoy : MonoBehaviour
 {
     public int h = 64;
     int w;
-    protected void Start()
-    {
-        if (!SystemInfo.supportsImageEffects)
-        {
-            enabled = false;
-            return;
-        }
-    }
+
     void Update()
     {
 

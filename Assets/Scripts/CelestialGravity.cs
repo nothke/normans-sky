@@ -8,9 +8,8 @@ public class CelestialGravity : MonoBehaviour
     public float bodyMass = 100000;
     //public float bodyEarthMasses = 1;
     //public float gravitationalConstant = 0.000006f;
-    //public float gravityRange;
 
-    static float gravityRange = 2000;
+    //static float gravityRange = 2000;
 
     public bool drawGizmos;
 

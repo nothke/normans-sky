@@ -50,12 +50,6 @@ namespace UnityStandardAssets.ImageEffects
 
         protected void Start ()
         {
-            // Disable if we don't support image effects
-            if (!SystemInfo.supportsImageEffects) {
-                enabled = false;
-                return;
-            }
-
             if ( shaderRGB == null || shaderYUV == null )
             {
                 Debug.Log( "Noise shaders are not set up! Disabling noise effect." );
