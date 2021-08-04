@@ -13,9 +13,6 @@ public class CelestialGravity : MonoBehaviour
 
     public bool drawGizmos;
 
-    public static List<Rigidbody> sceneRigidbodies = new List<Rigidbody>();
-
-
     // in reality gravitational constant G is
     // G = 6.674 × 10^−11 Nm2/kg2
     // and mass of the earth is
@@ -46,13 +43,6 @@ public class CelestialGravity : MonoBehaviour
         //Gizmos.DrawWireSphere(transform.position, GetThresholdDistance(bodyMass));
         Gizmos.DrawWireSphere(transform.position, gravAt);
 
-    }
-
-    void Start()
-    {
-        // I am using only the player ship so no need to search for rigidbodies,
-        // To get all rigidbodies in the scene uncomment this:
-        sceneRigidbodies.AddRange(FindObjectsOfType(typeof(Rigidbody)) as Rigidbody[]);
     }
 
     public static float GetForceMagnitude(float bodyEarthMasses, float rbMassKilos, float squareDistance)
@@ -110,9 +100,12 @@ public class CelestialGravity : MonoBehaviour
             //Motion.e.currentPlanet = GetComponent<PlanetEntity>();
         }
 
-        foreach (Rigidbody rb in sceneRigidbodies)
+        if (Game.e)
         {
-            ApplyGravityForce(rb);
+            foreach (Rigidbody rb in Game.e.rigidbodies)
+            {
+                ApplyGravityForce(rb);
+            }
         }
     }
 

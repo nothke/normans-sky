@@ -7,7 +7,6 @@ public class PlayerController : MonoBehaviour
 
     public float walkSpeed = 6;
     public float runSpeed = 10;
-    public float strafeSpeed = 5;
     public float gravity = 20;
     public float jumpHeight = 2;
     public bool canJump = true;
@@ -35,12 +34,12 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         // get correct speed
-        float forwardAndBackSpeed = walkSpeed;
+        float inputSpeed = walkSpeed;
 
         // if running, set run speed
         if (isRunning)
         {
-            forwardAndBackSpeed = runSpeed;
+            inputSpeed = runSpeed;
         }
 
         Vector3 groundVelocity = Vector3.zero;
@@ -48,8 +47,10 @@ public class PlayerController : MonoBehaviour
         if (groundRigidbody)
             groundVelocity = groundRigidbody.GetPointVelocity(groundHitPoint);
 
+        Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Forward"));
+
         // calculate how fast it should be moving
-        Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal") * strafeSpeed, 0, Input.GetAxis("Forward") * forwardAndBackSpeed);
+        Vector3 targetVelocity = input * inputSpeed;
         targetVelocity = transform.TransformDirection(targetVelocity);
 
         // apply a force that attempts to reach our target velocity
@@ -69,9 +70,6 @@ public class PlayerController : MonoBehaviour
             rigidbody.velocity = new Vector3(velocity.x, Mathf.Sqrt(2 * jumpHeight * gravity), velocity.z);
             isGrounded = false;
         }
-
-        // apply gravity
-        //rigidbody.AddForce(Physics.gravity);
     }
 
     Vector3 groundRigidbodyVelocity;
@@ -81,17 +79,7 @@ public class PlayerController : MonoBehaviour
         // check if the player is touching a surface below them
         checkGrounded();
 
-        // check if the player is running
-        if (isGrounded && Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            isRunning = true;
-        }
-
-        // check if the player stops running
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            isRunning = false;
-        }
+        isRunning = isGrounded && Input.GetKey(KeyCode.LeftShift);
     }
 
     Rigidbody groundRigidbody;

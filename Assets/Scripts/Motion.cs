@@ -94,7 +94,8 @@ public class Motion : MonoBehaviour
         originalDrag = GetComponent<Rigidbody>().drag;
 
         rb = GetComponent<Rigidbody>();
-        CelestialGravity.sceneRigidbodies.Add(rb);
+
+        //CelestialGravity.sceneRigidbodies.Add(rb);
     }
 
     void ShiftOrigin()
@@ -155,7 +156,7 @@ public class Motion : MonoBehaviour
     void Update()
     {
 
-        
+
 
 
         velocity = rb.velocity.magnitude;
