@@ -7,6 +7,7 @@
 	}
 	SubShader {
 		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
+		Cull Off
 		LOD 200
 		
 		CGPROGRAM

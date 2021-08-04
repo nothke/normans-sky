@@ -15,16 +15,16 @@ public class RingMaker : MonoBehaviour
 
     public int crossSegments = 64;
 
-    public float startRadius = 1;
+    public float firstRadius = 1;
     public float minRadius = 0.01f;
     public float maxRadius = 1;
 
-    public Tube tube;
+    RingRenderer ring;
 
     void Start()
     {
-        tube = gameObject.GetComponent<Tube>() ?? gameObject.AddComponent<Tube>();
-        tube = gameObject.GetComponent<Tube>();
+        ring = gameObject.GetComponent<RingRenderer>() ?? gameObject.AddComponent<RingRenderer>();
+        ring = gameObject.GetComponent<RingRenderer>();
 
         Generate();
     }
@@ -36,26 +36,35 @@ public class RingMaker : MonoBehaviour
 
         int rings = Random.Range(minRings, maxRings);
 
-        tube.segments = new Tube.Segment[rings];
+        ring.segments = new RingRenderer.Segment[rings];
 
-        tube.capEnds = false;
-        tube.internalMaterial = curMat;
-        tube.crossSegments = crossSegments;
+        ring.crossSegments = crossSegments;
 
-        float radius = startRadius;
+        float endRadius = firstRadius;
+
+        ring.material = material;
+
+        Color prevColor = Color.clear;
 
         for (int i = 0; i < rings; i++)
         {
-            radius += Random.Range(minRadius, maxRadius);
+            float startRadius = endRadius;
+
+            endRadius += Random.Range(minRadius, maxRadius);
 
             Color c = Random.value < 0.4f ? GetLerpedColor() : Color.clear;
-            tube.segments[i] = new Tube.Segment(radius, 0.002f, curMat, c);
+
+            ring.segments[i] = new RingRenderer.Segment(startRadius, endRadius, prevColor, c);
+
+            prevColor = c;
+
+            //firstRadius = endRadius;
         }
 
-        tube.segments[0].vertexColor = Color.clear;
-        tube.segments[rings - 1].vertexColor = Color.clear;
+        ring.segments[0].startVertexColor = Color.clear;
+        ring.segments[rings - 1].endVertexColor = Color.clear;
 
-        tube.Remesh();
+        ring.Remesh();
     }
 
     Color GetLerpedColor()

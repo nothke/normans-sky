@@ -1,4 +1,6 @@
-﻿Shader "Custom/PerlinTest" {
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+Shader "Custom/PerlinTest" {
 	Properties{
 		_Color("Color", Color) = (1,1,1,1)
 		_ColorLow("Color", Color) = (0,0,0,0)
@@ -86,7 +88,7 @@
 		half _Displacement;
 
 		void vert(inout appdata  v) {
-			float3 worldPos = mul(_Object2World, v.vertex).xyz;// + _Time * 10;
+			float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;// + _Time * 10;
 			float3 vertexBase = v.vertex.xyz;
 
 			float finNoise = finalNoise(worldPos);

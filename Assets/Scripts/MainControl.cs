@@ -25,12 +25,12 @@ public class MainControl : MonoBehaviour {
 
         yield return null;
 
-        SimplexUniverse.e.CreateAllSectors();
+        SectorUniverse.e.CreateAllSectors();
         loading.text = "Creating Universe..";
 
         yield return null;
 
-        SimplexUniverse.e.GeneratePhysical();
+        SectorUniverse.e.GeneratePhysical();
         loading.text = "Creating universe..";
 
         yield return null;

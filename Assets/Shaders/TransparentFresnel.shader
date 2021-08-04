@@ -1,4 +1,6 @@
-﻿Shader "Custom/TransparentFresnel"
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+Shader "Custom/TransparentFresnel"
 {
 	Properties
 	{
@@ -35,7 +37,7 @@
 	void vert(inout appdata_base v, out Input o) {
 		UNITY_INITIALIZE_OUTPUT(Input, o);
 
-		float dist = _FadeDistance * (-100 + distance(_WorldSpaceCameraPos, mul(_Object2World, v.vertex)));
+		float dist = _FadeDistance * (-100 + distance(_WorldSpaceCameraPos, mul(unity_ObjectToWorld, v.vertex)));
 		
 		o.dist = dist;
 		//o.color = 1;

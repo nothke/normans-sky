@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using VectorExtensions;
 
-public class SimplexUniverse : MonoBehaviour
+public class SectorUniverse : MonoBehaviour
 {
-    public static SimplexUniverse e;
+    public static SectorUniverse e;
 
     public int curSectorX;
     public int curSectorY;
@@ -54,6 +54,7 @@ public class SimplexUniverse : MonoBehaviour
 
     [Header("Generator Prefabs")]
     public bool generate = false;
+    public bool generateRings;
     public GameObject starPrefab;
     public GameObject planetPrefab;
 
@@ -335,14 +336,15 @@ public class SimplexUniverse : MonoBehaviour
 
                     PlanetEntity planet = planetGO.GetComponent<PlanetEntity>();
 
-                    planet.radius = Random.Range(minPlanetRadius, maxPlanetRadius);
+                    planet.radius = sector.planetRadii[i];
 
                     if (planet.radius < gasGiantThreshold)
                     {
                         planet.type = PlanetEntity.Type.GasGiant;
 
-                        if (Random.value < 0.5f)
-                            planet.GetComponent<RingMaker>().enabled = true;
+                        if (generateRings)
+                            if (Random.value < 0.5f)
+                                planet.GetComponent<RingMaker>().enabled = true;
                     }
 
                     sector.star[0].planets[i] = planet;
@@ -530,7 +532,9 @@ public class SimplexUniverse : MonoBehaviour
         if (sectors == null)
             return;
 
+#if UNITY_EDITOR
         UnityEditor.Handles.color = orbitColor;
+#endif
 
         foreach (var sector in sectors)
         {
@@ -540,7 +544,7 @@ public class SimplexUniverse : MonoBehaviour
             {
                 if (previewSectors)
                 {
-                    Gizmos.color = Color.gray;
+                    Gizmos.color = new Color(1,1,1,0.1f);
                     Gizmos.DrawWireCube(GetSectorMidPos(sector), Vector3.one * sectorSeparation);
                 }
 
@@ -552,8 +556,10 @@ public class SimplexUniverse : MonoBehaviour
 
                     Gizmos.DrawSphere(sectorStartPos + sector.starPostion, starPreviewRadius);
 
+#if UNITY_EDITOR
                     if (previewNames)
                         UnityEditor.Handles.Label(sectorStartPos + sector.starPostion, sector.name);
+#endif
 
                     if (previewPlanets && sector.planetPositions.Length > 0)
                     {
@@ -562,11 +568,12 @@ public class SimplexUniverse : MonoBehaviour
                             Gizmos.color = sector.planetColors[i];
                             Gizmos.DrawSphere(sectorStartPos + sector.planetPositions[i], sector.planetRadii[i]); // planetPreviewRadius
 
-
+#if UNITY_EDITOR
                             if (drawOrbits)
                             {
                                 UnityEditor.Handles.DrawWireDisc(sectorStartPos + sector.starPostion, sector.orbitNormal, sector.planetOrbits[i]);
                             }
+#endif
                         }
                     }
                 }

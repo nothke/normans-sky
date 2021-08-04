@@ -46,14 +46,14 @@ public class CelestialGravity : MonoBehaviour
 
         //Gizmos.DrawWireSphere(transform.position, GetThresholdDistance(bodyMass));
         Gizmos.DrawWireSphere(transform.position, gravAt);
-        
+
     }
 
     void Start()
     {
         // I am using only the player ship so no need to search for rigidbodies,
         // To get all rigidbodies in the scene uncomment this:
-        //sceneRigidbodies = FindObjectsOfType(typeof(Rigidbody)) as Rigidbody[];
+        sceneRigidbodies.AddRange(FindObjectsOfType(typeof(Rigidbody)) as Rigidbody[]);
     }
 
     public static float GetForceMagnitude(float bodyEarthMasses, float rbMassKilos, float squareDistance)
@@ -82,16 +82,16 @@ public class CelestialGravity : MonoBehaviour
     bool isIn;
     bool wasIn;
 
+    float RangeSqr { get { return gravAt * gravAt; } }
+
     void Update()
     {
-        float rangeSqr = gravAt * gravAt;
-
         if (Motion.e)
         {
             // check if ship is within range of this planet
             Vector3 motionDir = transform.position - Motion.e.transform.position;
 
-            if ((motionDir).sqrMagnitude < rangeSqr)
+            if ((motionDir).sqrMagnitude < RangeSqr)
             {
                 if (!wasIn)
                     Motion.e.AddBody(GetComponent<CelestialBody>());
@@ -107,20 +107,25 @@ public class CelestialGravity : MonoBehaviour
             }
 
 
-                // make it the current planet
-                //Motion.e.currentPlanet = GetComponent<PlanetEntity>();
+            // make it the current planet
+            //Motion.e.currentPlanet = GetComponent<PlanetEntity>();
         }
 
         foreach (Rigidbody rb in sceneRigidbodies)
         {
-            Vector3 direction = transform.position - rb.position;
-            float rSqr = (direction).sqrMagnitude;
+            ApplyGravityForce(rb);
+        }
+    }
 
-            if (rSqr < rangeSqr)
-            {
-                force = GetAcceleration(bodyMass, rSqr);
-                rb.AddForce(force * direction.normalized * Time.deltaTime, ForceMode.Acceleration);
-            }
+    public void ApplyGravityForce(Rigidbody rb)
+    {
+        Vector3 direction = transform.position - rb.position;
+        float rSqr = (direction).sqrMagnitude;
+
+        if (rSqr < RangeSqr)
+        {
+            force = GetAcceleration(bodyMass, rSqr);
+            rb.AddForce(force * direction.normalized * Time.deltaTime, ForceMode.Acceleration);
         }
     }
 }
