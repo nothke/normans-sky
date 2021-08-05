@@ -10,8 +10,6 @@ public class CelestialGravity : MonoBehaviour
 
     public bool drawGizmos;
 
-    Rigidbody[] sceneRigidbodies;
-
     [HideInInspector]
     public float force;
 
@@ -23,13 +21,6 @@ public class CelestialGravity : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, gravityRange);
     }
 
-    // Use this for initialization
-    void Start()
-    {
-
-        sceneRigidbodies = FindObjectsOfType(typeof(Rigidbody)) as Rigidbody[];
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -39,20 +30,23 @@ public class CelestialGravity : MonoBehaviour
             return;
         }
 
-        Vector3 motionDir = transform.position - Motion.e.transform.position;
-        if ((motionDir).sqrMagnitude < gravityRange * gravityRange)
+        Vector3 motionDiff = transform.position - Motion.e.transform.position;
+        if ((motionDiff).sqrMagnitude < gravityRange * gravityRange)
             Motion.e.currentPlanet = GetComponent<PlanetEntity>();
 
-        foreach (Rigidbody rb in sceneRigidbodies)
+        if (BodyManager.e)
         {
-            Vector3 direction = transform.position - rb.position;
-            float rSqr = (direction).sqrMagnitude;
-
-            force = (gravitationalConstant * rb.mass * planetMass) / rSqr;
-
-            if (rSqr < gravityRange * gravityRange)
+            foreach (Rigidbody rb in BodyManager.e.rigidbodies)
             {
-                rb.AddForce(force * direction.normalized * Time.deltaTime);
+                Vector3 direction = transform.position - rb.position;
+                float rSqr = (direction).sqrMagnitude;
+
+                force = (gravitationalConstant * rb.mass * planetMass) / rSqr;
+
+                if (rSqr < gravityRange * gravityRange)
+                {
+                    rb.AddForce(force * direction.normalized * Time.deltaTime);
+                }
             }
         }
     }
