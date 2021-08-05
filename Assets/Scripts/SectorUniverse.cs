@@ -9,7 +9,7 @@ public class SectorUniverse : MonoBehaviour
     public static SectorUniverse e;
 
     #region Inspector vars
-    
+
     public Vector3Int currentSector;
 
     [Range(1, 10)]
@@ -101,6 +101,9 @@ public class SectorUniverse : MonoBehaviour
 
     Sector[,,] sectors;
 
+    GameObjectPool starPool;
+    GameObjectPool planetPool;
+
     #endregion
 
     void Awake()
@@ -126,9 +129,10 @@ public class SectorUniverse : MonoBehaviour
         nameSuffixes = SReader.GetLines(path, "SUFFIXES");
     }
 
-    void CreateSimplex()
+    void CreateGeneratorIfNeeded()
     {
-        if (simplex == null) simplex = new SimplexNoiseGenerator("42");
+        if (simplex == null)
+            simplex = new SimplexNoiseGenerator("42");
     }
 
     int GetSectorRange()
@@ -187,12 +191,12 @@ public class SectorUniverse : MonoBehaviour
 
     void SmartMovePhysical(Vector3Int by)
     {
-        // PASS 1 - rearrange and flag
+        // PASS 1 - Move stars and release out of bounds stars
         foreach (var sector in sectors)
         {
             if (CoordinateIsInsideBounds(sector.coordinate - by))
             {
-                // if next sector is inside bounds, transfer this system into the next sector..
+                // Transfer this star into the next sector..
                 Sector nextSector = GetSectorFromWorldCoord(sector.coordinate - by);
                 nextSector.newStar = sector.star;
 
@@ -201,29 +205,20 @@ public class SectorUniverse : MonoBehaviour
             }
             else
             {
-                // else flag system for destruction
-                sector.flagDestroy = true;
+                // if the sector is out of bounds release the star back into the pool
+                ReleaseStarSystem(sector.star);
             }
         }
-
 
         // change current sector
         currentSector += by;
 
-        // PASS 2 - destroy and construct
+        // PASS 2 - Construct new sectors
         foreach (var sector in sectors)
         {
-            if (sector.flagDestroy)
-            {
-                DestroySystem(sector.star);
-
-                sector.flagDestroy = false;
-            }
-
             sector.star = null;
 
-            // now set new coordinates
-            sector.coordinate = sector.coordinate + by;
+            sector.coordinate += by;
 
             // overwrite star with ones that are transfered
             if (sector.newStar != null)
@@ -264,31 +259,11 @@ public class SectorUniverse : MonoBehaviour
 
     void ClearAllPhysical()
     {
-        float tTest = Time.realtimeSinceStartup; // TEST TIMER
-
         foreach (var sector in sectors)
         {
-            if (!sector.hasSystem) continue;
-
-            if (sector.star == null) continue;
-
-            if (sector.star.Length == 0) continue;
-
-            for (int i = 0; i < sector.star.Length; i++)
-            {
-                if (sector.star[i].planets.Length > 0) continue;
-
-                for (int j = 0; j < sector.star[i].planets.Length; j++)
-                {
-                    Destroy(sector.star[i].planets[j].gameObject);
-                }
-
-                Destroy(sector.star[i].gameObject);
-            }
+            if (sector.star != null && sector.star.Length > 0)
+                ReleaseStarSystem(sector.star);
         }
-
-        Debug.Log("Clear all physical: " + (Time.realtimeSinceStartup - tTest)); // TEST TIMER
-
     }
 
     IEnumerator FrameAfter()
@@ -313,6 +288,10 @@ public class SectorUniverse : MonoBehaviour
             return;
         }
 
+        int sectorCount = sectorRange * sectorRange * sectorRange;
+        starPool = new GameObjectPool(starPrefab, sectorCount);
+        planetPool = new GameObjectPool(planetPrefab, sectorCount * maxPlanets);
+
         ClearAllPhysical();
 
         float tTest = Time.realtimeSinceStartup; // TEST TIMER
@@ -333,24 +312,39 @@ public class SectorUniverse : MonoBehaviour
         {
             Vector3 sectorStartPos = GetSectorStartPos(sector);
 
-            GameObject starGO = Instantiate(starPrefab, sectorStartPos + sector.starPostion, Quaternion.identity) as GameObject;
+            GameObject starGO = starPool.GetGO();
+            starGO.transform.position = sectorStartPos + sector.starPostion;
+
             if (Motion.e) Motion.e.chunks.Add(starGO.transform);
-            // material color?
+
+            // TODO: material color
 
             // if not a nebula generate only one star
-            sector.star = new StarEntity[1];
+            if (sector.star == null)
+                sector.star = new StarEntity[1];
+
             sector.star[0] = starGO.GetComponent<StarEntity>();
+
+            StarEntity star = sector.star[0];
 
             if (sector.planetPositions.Length > 0)
             {
-                sector.star[0].planets = new PlanetEntity[sector.planetPositions.Length];
+                if (star.planets == null)
+                    star.planets = new List<PlanetEntity>(maxPlanets);
+
+                star.planets.Clear();
 
                 for (int i = 0; i < sector.planetPositions.Length; i++)
                 {
-                    GameObject planetGO = Instantiate(planetPrefab, sectorStartPos + sector.planetPositions[i], Quaternion.identity) as GameObject;
-                    if (Motion.e) Motion.e.chunks.Add(planetGO.transform);
+                    GameObject planetGO = planetPool.GetGO();
+                    planetGO.transform.position = sectorStartPos + sector.planetPositions[i];
+
+                    if (Motion.e)
+                        Motion.e.chunks.Add(planetGO.transform);
 
                     PlanetEntity planet = planetGO.GetComponent<PlanetEntity>();
+
+                    Debug.Assert(planet, "PlanetEntity not found on planetPrefab");
 
                     planet.radius = sector.planetRadii[i];
 
@@ -363,8 +357,9 @@ public class SectorUniverse : MonoBehaviour
                                 planet.GetComponent<RingMaker>().enabled = true;
                     }
 
-                    sector.star[0].planets[i] = planet;
-                    if (!sector.star[0].planets[i]) Debug.LogWarning("PlanetEntity not found");
+                    Debug.Assert(star.planets != null, "Planets are null");
+
+                    star.planets.Add(planet);
                 }
             }
         }
@@ -393,7 +388,7 @@ public class SectorUniverse : MonoBehaviour
 
     Sector CreateNewSector(Vector3Int coord)
     {
-        CreateSimplex();
+        CreateGeneratorIfNeeded();
 
         Sector s = new Sector();
         s.coordinate = coord;
@@ -457,22 +452,22 @@ public class SectorUniverse : MonoBehaviour
         Random.state = randState;
     }
 
-    void DestroySystem(StarEntity[] stars)
+    void ReleaseStarSystem(StarEntity[] stars)
     {
-        if (stars == null) return;
-
-        if (stars.Length == 0) return;
+        if (stars == null || stars.Length == 0) return;
 
         for (int i = 0; i < stars.Length; i++)
         {
-            if (stars[i].planets.Length > 0)
-                for (int j = 0; j < stars[i].planets.Length; j++)
-                {
-                    //if (stars[i].planets[i]) // shouldn't happen
-                    Destroy(stars[i].planets[j].gameObject);
-                }
+            var star = stars[i];
 
-            Destroy(stars[i].gameObject);
+            foreach (var planet in star.planets)
+            {
+                planetPool.Release(planet.gameObject);
+            }
+
+            starPool.Release(star.gameObject);
+
+            stars[i] = null;
         }
     }
 
