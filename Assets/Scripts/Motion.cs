@@ -310,9 +310,9 @@ public class Motion : MonoBehaviour
 
         GUILayout.Space(5);
 
-        if (SimplexUniverse.e != null)
+        if (SectorUniverse.e != null)
         {
-            SimplexUniverse su = SimplexUniverse.e;
+            SectorUniverse su = SectorUniverse.e;
 
             GUILayout.Label("Sector " + su.curSectorX + ", " + su.curSectorY + ", " + su.curSectorZ, guiStyle);
         }

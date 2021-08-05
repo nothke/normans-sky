@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using VectorExtensions;
 
-public class SimplexUniverse : MonoBehaviour
+public class SectorUniverse : MonoBehaviour
 {
-    public static SimplexUniverse e;
+    public static SectorUniverse e;
 
     public int curSectorX;
     public int curSectorY;
