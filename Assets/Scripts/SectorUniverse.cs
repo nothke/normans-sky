@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using Nothke.Collections;
+
 public class SectorUniverse : MonoBehaviour
 {
     public static SectorUniverse e;
@@ -36,6 +38,9 @@ public class SectorUniverse : MonoBehaviour
 
     public bool skipZero = true;
 
+    public Gradient starColorGradient;
+    public Gradient planetColorGradient;
+
     [Header("Generator Prefabs")]
     public bool generate = false;
     public bool generateRings;
@@ -65,8 +70,36 @@ public class SectorUniverse : MonoBehaviour
 
     #region Private vars
 
-        SimplexNoiseGenerator simplex;
+    public class Sector
+    {
+        public Vector3Int coordinate;
+
+        public bool hasSystem;
+
+        public string name;
+
+        public Vector3 orbitNormal;
+
+        public float starSize; // incomplete
+        public Vector3 starPostion;
+        public Color starColor;
+
+        public float[] planetOrbits;
+        public float[] planetRadii;
+        public Vector3[] planetPositions;
+        public Color[] planetColors;
+
+        //public StarEntity star;
+        public StarEntity[] star;
+        //public StarEntity newStar;
+        public StarEntity[] newStar;
+        public bool flagDestroy;
+    }
+
+    SimplexNoiseGenerator simplex;
     int sectorRange = -1;
+
+    Sector[,,] sectors;
 
     #endregion
 
@@ -93,39 +126,10 @@ public class SectorUniverse : MonoBehaviour
         nameSuffixes = SReader.GetLines(path, "SUFFIXES");
     }
 
-    public Gradient starColorGradient;
-    public Gradient planetColorGradient;
-
-    public class Sector
-    {
-        public Vector3Int coordinate;
-
-        public bool hasSystem;
-
-        public string name;
-
-        public Vector3 orbitNormal;
-
-        public float starSize; // incomplete
-        public Vector3 starPostion;
-        public Color starColor;
-
-        public float[] planetOrbits;
-        public float[] planetRadii;
-        public Vector3[] planetPositions;
-        public Color[] planetColors;
-
-        public StarEntity[] star;
-        public StarEntity[] newStar;
-        public bool flagDestroy;
-    }
-
     void CreateSimplex()
     {
         if (simplex == null) simplex = new SimplexNoiseGenerator("42");
     }
-
-    Sector[,,] sectors;
 
     int GetSectorRange()
     {
@@ -510,8 +514,6 @@ public class SectorUniverse : MonoBehaviour
         return GetSectorMidPos(x, y, z) - (Vector3.one * sectorSeparation / 2);
     }
 
-    int prevCurX, prevCurY, prevCurZ;
-
     void OnValidate()
     {
         CreateAllSectors();
@@ -521,16 +523,6 @@ public class SectorUniverse : MonoBehaviour
             UpdateNames();
             updateNames = false;
         }
-
-        /*
-        if (curSectorX != prevCurX || curSectorY != prevCurY || curSectorZ != prevCurZ)
-        {
-            CreateAllSectors();
-
-            prevCurX = curSectorX;
-            prevCurY = curSectorY;
-            prevCurZ = curSectorZ;
-        }*/
     }
 
 #if UNITY_EDITOR

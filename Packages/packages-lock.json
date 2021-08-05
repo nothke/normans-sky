@@ -80,6 +80,13 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "nothke.pool": {
+      "version": "https://github.com/nothke/Pool.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "bc0ec866c2d80fa01dc17ab19cbb46ea3927e9a8"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
