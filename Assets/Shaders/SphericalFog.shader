@@ -1,3 +1,7 @@
+// Upgrade NOTE: replaced '_LightMatrix0' with 'unity_WorldToLight'
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 /// Originally made by runevision
 /// Upgraded by Nothke to support point lights, colored lights, attenuation
 /// Probably VERY unoptimized
@@ -32,7 +36,7 @@ Shader "FX/Spherical Fog" {
 
 				uniform float4 _LightColor0;
 				// color of light source (from "Lighting.cginc")
-				uniform float4x4 _LightMatrix0; // transformation from world to light space (from Autolight.cginc)
+				uniform float4x4 unity_WorldToLight; // transformation from world to light space (from Autolight.cginc)
 				uniform sampler2D _LightTexture0; // cookie alpha texture map (from Autolight.cginc)
 				 
 				inline float CalcVolumeFogIntensity (
@@ -125,8 +129,8 @@ Shader "FX/Spherical Fog" {
 				v2f vert (appdata_base v, float3 normal : NORMAL) {
 					v2f o;
 					//float4 wPos = mul (_Object2World, v.vertex);
-					o.posWorld = mul(_Object2World, v.vertex);
-					o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+					o.posWorld = mul(unity_ObjectToWorld, v.vertex);
+					o.pos = UnityObjectToClipPos (v.vertex);
 					o.lightDir = ObjSpaceLightDir(v.vertex);
 					o.view = o.posWorld.xyz - _WorldSpaceCameraPos;
 					o.projPos = ComputeScreenPos (o.pos);
@@ -138,12 +142,12 @@ Shader "FX/Spherical Fog" {
 					//float4x4 modelMatrixInverse = _World2Object;
 
 					//o.posWorld = mul(_Object2World, v.vertex);
-					o.posLight = mul(_LightMatrix0, o.posWorld);
+					o.posLight = mul(unity_WorldToLight, o.posWorld);
 				 	// }
 
 				 	// Farfarer
 				 	//#ifdef POINT
-					o._LightCoord = mul(_LightMatrix0, mul(_Object2World, v.vertex)).xyz; // Replace X with name of your struct... traditionally o it seems.
+					o._LightCoord = mul(unity_WorldToLight, mul(unity_ObjectToWorld, v.vertex)).xyz; // Replace X with name of your struct... traditionally o it seems.
 					//#endif
 
 					// Move projected z to near plane if point is behind near plane.

@@ -1,4 +1,6 @@
-﻿Shader "Custom/Planet" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/Planet" {
 	Properties{
 		_MainTex("Texture (RGB)", 2D) = "black" {}
 	_Color("Color", Color) = (0, 0, 0, 1)
@@ -36,7 +38,7 @@
 	v2f vert(appdata_base v) {
 		v2f o;
 		v.vertex.xyz += v.normal *     _Size;
-		o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.pos = UnityObjectToClipPos(v.vertex);
 		o.normal = v.normal;
 		float3 viewDir = normalize(ObjSpaceViewDir(v.vertex));
 		o.atmofalloff = float2(pow(saturate(dot(viewDir, v.normal)), _Falloff), 0.5);
