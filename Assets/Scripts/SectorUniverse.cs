@@ -411,14 +411,15 @@ public class SectorUniverse : MonoBehaviour
 
         Random.InitState(("ad" + x + "_" + y + "_" + z).GetHashCode());
 
-        if (value < systemProbability) // has no solar system
-            return;
-
-        // has a solar system:
         if (skipZero && s.coordinate == Vector3Int.zero)
             return;
 
-        s.hasSystem = true;
+        if (value < systemProbability) // has no solar system
+        {
+            s.hasSystem = false;
+            return;
+        }
+        else s.hasSystem = true;
 
         s.name = SReader.GetRandom(namePrefixes) + SReader.GetRandom(nameSuffixes);
         s.starPostion = new Vector3(Random.value, Random.value, Random.value) * sectorSeparation;
