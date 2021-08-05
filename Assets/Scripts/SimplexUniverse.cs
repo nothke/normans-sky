@@ -370,7 +370,8 @@ public class SimplexUniverse : MonoBehaviour
         float value = simplex.coherentNoise(x, y, z, octaves, multiplier, amplitude, lacunarity, persistence);
         value += 0.5f;
 
-        Random.seed = ("ad" + x + "_" + y + "_" + z).GetHashCode();
+        var randState = Random.state;
+        Random.InitState(("ad" + x + "_" + y + "_" + z).GetHashCode());
 
         if (value < systemProbability) // has no solar system
             return;
@@ -407,6 +408,8 @@ public class SimplexUniverse : MonoBehaviour
             s.planetPositions[i] = s.starPostion + pos;
             s.planetColors[i] = planetColorGradient.Evaluate(Random.value);
         }
+
+        Random.state = randState;
     }
 
     void DestroySystem(StarEntity[] stars)

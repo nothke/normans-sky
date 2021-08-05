@@ -56,5 +56,22 @@ namespace SkyUtils
         }
 
         public static Vector3d zero = new Vector3d(0, 0, 0);
+
+        public override bool Equals(object obj)
+        {
+            return obj is Vector3d d &&
+                   x == d.x &&
+                   y == d.y &&
+                   z == d.z;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 373119288;
+            hashCode = hashCode * -1521134295 + x.GetHashCode();
+            hashCode = hashCode * -1521134295 + y.GetHashCode();
+            hashCode = hashCode * -1521134295 + z.GetHashCode();
+            return hashCode;
+        }
     }
 }

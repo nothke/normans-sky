@@ -313,13 +313,6 @@ public class Motion : MonoBehaviour
         UpdateShift();
 
         //Output();
-
-
-
-        if (Input.GetKeyDown(KeyCode.Tab))
-            Application.LoadLevel(0);
-
-
     }
 
     void UpdateShift()

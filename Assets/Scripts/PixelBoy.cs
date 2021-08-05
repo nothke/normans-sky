@@ -9,6 +9,8 @@ public class PixelBoy : MonoBehaviour
 {
     public int h = 64;
     int w;
+
+#if !UNITY_2018_1_OR_NEWER
     protected void Start()
     {
         if (!SystemInfo.supportsImageEffects)
@@ -17,6 +19,8 @@ public class PixelBoy : MonoBehaviour
             return;
         }
     }
+#endif
+
     void Update()
     {
 
