@@ -10470,39 +10470,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf0bc4230a10ac468cfeae0ca3f1246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  curSectorX: 13
-  curSectorY: 0
-  curSectorZ: 0
-  sectorSeparation: 50000
-  preview: 0
-  previewSectors: 1
-  previewSystems: 1
-  previewPlanets: 0
-  drawOrbits: 0
-  previewNames: 0
-  orbitColor: {r: 1, g: 1, b: 1, a: 1}
+  currentSector: {x: 0, y: 0, z: 0}
   sectorRadius: 2
-  systemProbability: 0.5
-  starPreviewRadius: 2000
-  planetPreviewRadius: 1000
-  skipZero: 1
+  sectorSeparation: 50000
   octaves: 3
   multiplier: 25
   amplitude: 1
   lacunarity: 2
   persistence: 0.9
+  systemProbability: 0.5
   maxPlanets: 5
-  minPlanetRange: 1937
-  minPlanetSeparation: 5
-  nextPlanetPower: 2
+  minPlanetRange: 5207
+  minPlanetSeparation: 1375.3
+  nextPlanetPower: 1.5
   maxPlanetRangeMult: 1000
   minPlanetRadius: 500
   maxPlanetRadius: 2000
   gasGiantThreshold: 1500
+  skipZero: 1
   generate: 1
   generateRings: 0
   starPrefab: {fileID: 128662, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
-  planetPrefab: {fileID: 119248, guid: 8ad343a14d375204884b143d2500e614, type: 3}
+  planetPrefab: {fileID: 197542, guid: 82c5d72f47757414dbd26d3023f08577, type: 3}
   updateNames: 0
   namePrefixes:
   - Altar
@@ -10714,7 +10703,16 @@ MonoBehaviour:
   - el
   - ond
   - illon
-  initOnStart: 0
+  initOnStart: 1
+  preview: 1
+  previewSectors: 1
+  previewSystems: 1
+  previewPlanets: 1
+  drawOrbits: 1
+  previewNames: 0
+  orbitColor: {r: 1, g: 1, b: 1, a: 1}
+  starPreviewRadius: 2000
+  planetPreviewRadius: 1000
   starColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
@@ -13579,7 +13577,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 119248, guid: 8ad343a14d375204884b143d2500e614, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 408938, guid: 8ad343a14d375204884b143d2500e614, type: 3}
       propertyPath: m_RootOrder
