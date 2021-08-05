@@ -314,7 +314,7 @@ public class Motion : MonoBehaviour
         {
             SectorUniverse su = SectorUniverse.e;
 
-            GUILayout.Label("Sector " + su.curSectorX + ", " + su.curSectorY + ", " + su.curSectorZ, guiStyle);
+            GUILayout.Label("Sector " + su.currentSector.x + ", " + su.currentSector.y + ", " + su.currentSector.z, guiStyle);
         }
 
         GUILayout.Space(5);

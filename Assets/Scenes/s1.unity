@@ -10470,7 +10470,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf0bc4230a10ac468cfeae0ca3f1246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  curSectorX: 3
+  curSectorX: 13
   curSectorY: 0
   curSectorZ: 0
   sectorSeparation: 50000
@@ -10479,7 +10479,7 @@ MonoBehaviour:
   previewSystems: 1
   previewPlanets: 0
   drawOrbits: 0
-  previewNames: 1
+  previewNames: 0
   orbitColor: {r: 1, g: 1, b: 1, a: 1}
   sectorRadius: 2
   systemProbability: 0.5
@@ -10500,6 +10500,7 @@ MonoBehaviour:
   maxPlanetRadius: 2000
   gasGiantThreshold: 1500
   generate: 1
+  generateRings: 0
   starPrefab: {fileID: 128662, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
   planetPrefab: {fileID: 119248, guid: 8ad343a14d375204884b143d2500e614, type: 3}
   updateNames: 0

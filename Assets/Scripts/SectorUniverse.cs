@@ -6,31 +6,13 @@ public class SectorUniverse : MonoBehaviour
 {
     public static SectorUniverse e;
 
-    public int curSectorX;
-    public int curSectorY;
-    public int curSectorZ;
-
-    public float sectorSeparation = 10;
-
-    public bool preview = true;
-    public bool previewSectors = true;
-    public bool previewSystems = true;
-    public bool previewPlanets = true;
-    public bool drawOrbits = false;
-    public bool previewNames = false;
-    public Color orbitColor = Color.white;
+    #region Inspector vars
+    
+    public Vector3Int currentSector;
 
     [Range(1, 10)]
     public int sectorRadius = 3;
-
-    int sectorRange = 10;
-
-    public float systemProbability = 0.5f;
-
-    public float starPreviewRadius = 1;
-    public float planetPreviewRadius = 0.5f;
-
-    public bool skipZero = true;
+    public float sectorSeparation = 10;
 
     [Header("Simplex properties")]
     public int octaves = 3;
@@ -40,6 +22,7 @@ public class SectorUniverse : MonoBehaviour
     public float persistence = 0.9f;
 
     [Header("System properties")]
+    public float systemProbability = 0.5f;
     public int maxPlanets = 10;
     public float minPlanetRange = 5;
     public float minPlanetSeparation = 5;
@@ -51,20 +34,41 @@ public class SectorUniverse : MonoBehaviour
 
     public float gasGiantThreshold = 1500;
 
+    public bool skipZero = true;
+
     [Header("Generator Prefabs")]
     public bool generate = false;
     public bool generateRings;
     public GameObject starPrefab;
     public GameObject planetPrefab;
 
-
-    SimplexNoiseGenerator simplex;
-
     public bool updateNames;
     public string[] namePrefixes;
     public string[] nameSuffixes;
 
     public bool initOnStart;
+
+    [Header("Preview")]
+
+    public bool preview = true;
+    public bool previewSectors = true;
+    public bool previewSystems = true;
+    public bool previewPlanets = true;
+    public bool drawOrbits = false;
+    public bool previewNames = false;
+    public Color orbitColor = Color.white;
+
+    public float starPreviewRadius = 1;
+    public float planetPreviewRadius = 0.5f;
+
+    #endregion
+
+    #region Private vars
+
+        SimplexNoiseGenerator simplex;
+    int sectorRange = -1;
+
+    #endregion
 
     void Awake()
     {
@@ -134,13 +138,17 @@ public class SectorUniverse : MonoBehaviour
 
         sectors = new Sector[sectorRange, sectorRange, sectorRange];
 
+        Vector3Int radiusVector = new Vector3Int(sectorRadius, sectorRadius, sectorRadius);
+
         for (int x = 0; x < sectorRange; x++)
         {
             for (int y = 0; y < sectorRange; y++)
             {
                 for (int z = 0; z < sectorRange; z++)
                 {
-                    sectors[x, y, z] = CreateNewSector(curSectorX - sectorRadius + x, curSectorY - sectorRadius + y, curSectorZ - sectorRadius + z);
+
+                    sectors[x, y, z] = CreateNewSector(currentSector - radiusVector + new Vector3Int(x, y, z));
+                    //sectors[x, y, z] = CreateNewSector(curSectorX - sectorRadius + x, curSectorY - sectorRadius + y, curSectorZ - sectorRadius + z);
 
                 }
             }
@@ -149,7 +157,12 @@ public class SectorUniverse : MonoBehaviour
 
     void Move(int byX, int byY, int byZ)
     {
-        SmartMovePhysical(byX, byY, byZ);
+        Move(new Vector3Int(byX, byY, byZ));
+    }
+
+    void Move(Vector3Int by)
+    {
+        SmartMovePhysical(by);
 
         /*
         ClearAllSectors();
@@ -161,19 +174,15 @@ public class SectorUniverse : MonoBehaviour
 
     bool CoordinateIsInsideBounds(Vector3Int coord)
     {
-        Vector3Int currentSector = GetCurSector();
-
         BoundsInt bounds = new BoundsInt(
             -sectorRadius, -sectorRadius, -sectorRadius,
             sectorRange, sectorRange, sectorRange);
 
-        return bounds.Contains(coord);
+        return bounds.Contains(coord - currentSector);
     }
 
-    void SmartMovePhysical(int byX, int byY, int byZ)
+    void SmartMovePhysical(Vector3Int by)
     {
-        Vector3Int by = new Vector3Int(byX, byY, byZ);
-
         // PASS 1 - rearrange and flag
         foreach (var sector in sectors)
         {
@@ -193,10 +202,9 @@ public class SectorUniverse : MonoBehaviour
             }
         }
 
+
         // change current sector
-        curSectorX += byX;
-        curSectorY += byY;
-        curSectorZ += byZ;
+        currentSector += by;
 
         // PASS 2 - destroy and construct
         foreach (var sector in sectors)
@@ -245,7 +253,7 @@ public class SectorUniverse : MonoBehaviour
 
     Sector GetSectorFromWorldCoord(Vector3Int coord)
     {
-        Vector3Int localCoord = coord + Vector3Int.one * sectorRadius - GetCurSector();
+        Vector3Int localCoord = coord + Vector3Int.one * sectorRadius - currentSector;
 
         return sectors[localCoord.x, localCoord.y, localCoord.z];
     }
@@ -292,9 +300,14 @@ public class SectorUniverse : MonoBehaviour
 
     public void GeneratePhysical()
     {
-        if (!generate) return;
+        if (!generate)
+            return;
 
-        if (!starPrefab || !planetPrefab) return;
+        if (!starPrefab || !planetPrefab)
+        {
+            Debug.LogError("Star or Planet prefabs are missing");
+            return;
+        }
 
         ClearAllPhysical();
 
@@ -374,13 +387,12 @@ public class SectorUniverse : MonoBehaviour
         }
     }
 
-    Sector CreateNewSector(int x, int y, int z)
+    Sector CreateNewSector(Vector3Int coord)
     {
         CreateSimplex();
 
         Sector s = new Sector();
-
-        s.coordinate = new Vector3Int(x, y, z);
+        s.coordinate = coord;
 
         CreateSector(s);
 
@@ -460,12 +472,6 @@ public class SectorUniverse : MonoBehaviour
         }
     }
 
-    Vector3Int GetCurSector()
-    {
-        return new Vector3Int(curSectorX, curSectorY, curSectorZ);
-    }
-
-
     private Vector3 RandomPointOnPlane(Vector3 normal, float radius)
     {
         Vector3 randomPoint;
@@ -488,7 +494,7 @@ public class SectorUniverse : MonoBehaviour
 
     Vector3 GetSectorMidPos(int x, int y, int z)
     {
-        Vector3 relativeSector = new Vector3(x - curSectorX, y - curSectorY, z - curSectorZ);
+        Vector3 relativeSector = new Vector3(x - currentSector.x, y - currentSector.y, z - currentSector.z);
         //relativeSector -= Vector3.one * (0.5f * sectorRange - 0.5f); // OLD calc
 
         return relativeSector * sectorSeparation;
@@ -535,6 +541,8 @@ public class SectorUniverse : MonoBehaviour
 
         if (sectors == null)
             return;
+
+        sectorRange = GetSectorRange();
 
         UnityEditor.Handles.color = orbitColor;
 
