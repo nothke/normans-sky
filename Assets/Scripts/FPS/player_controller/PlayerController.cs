@@ -13,12 +13,21 @@ public class PlayerController : MonoBehaviour
     private bool isRunning = false;
     private bool isGrounded = false;
 
+    public float groundingRayLength = 0.7f;
+
     public bool IsRunning
     {
         get { return isRunning; }
     }
 
     new Rigidbody rigidbody;
+
+    Rigidbody groundRigidbody;
+    Vector3 groundHitPoint;
+
+    Vector3 groundRigidbodyVelocity;
+
+    bool wantsToJump;
 
     void Awake()
     {
@@ -33,87 +42,69 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // get correct speed
-        float inputSpeed = walkSpeed;
-
-        // if running, set run speed
-        if (isRunning)
-        {
-            inputSpeed = runSpeed;
-        }
-
-        Vector3 groundVelocity = Vector3.zero;
-
-        if (groundRigidbody)
-            groundVelocity = groundRigidbody.GetPointVelocity(groundHitPoint);
+        float inputSpeed = !isRunning ? walkSpeed : runSpeed;
 
         Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Forward"));
 
-        // calculate how fast it should be moving
-        Vector3 targetVelocity = input * inputSpeed;
-        targetVelocity = transform.TransformDirection(targetVelocity);
-
-        // apply a force that attempts to reach our target velocity
-        Vector3 velocity = rigidbody.velocity;
-        Vector3 velocityChange = (targetVelocity - velocity) + groundVelocity;
-
-        // kill vertical velocity change
-        Vector3 tVel = transform.InverseTransformDirection(velocityChange);
-        tVel.y = 0;
-        velocityChange = transform.TransformDirection(tVel);
-
-        rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
-
-        // jump
-        if (canJump && isGrounded && Input.GetButton("Jump"))
+        if (isGrounded)
         {
-            rigidbody.velocity = new Vector3(velocity.x, Mathf.Sqrt(2 * jumpHeight * gravity), velocity.z);
-            isGrounded = false;
+            Vector3 groundVelocity = groundRigidbody ?
+                groundRigidbody.GetPointVelocity(groundHitPoint)
+                : Vector3.zero;
+
+            // calculate how fast it should be moving
+            Vector3 targetVelocity = input * inputSpeed;
+            targetVelocity = transform.TransformDirection(targetVelocity);
+
+            // apply a force that attempts to reach our target velocity
+            Vector3 velocity = rigidbody.velocity;
+            Vector3 velocityChange = (targetVelocity - velocity) + groundVelocity;
+
+            // kill vertical velocity change
+            Vector3 tVel = transform.InverseTransformDirection(velocityChange);
+            tVel.y = 0;
+            velocityChange = transform.TransformDirection(tVel);
+
+            rigidbody.AddForce(velocityChange * 60, ForceMode.Acceleration);
+
+            // jump
+            if (wantsToJump && canJump)
+            {
+                rigidbody.velocity += transform.up * jumpHeight;// new Vector3(velocity.x, Mathf.Sqrt(2 * jumpHeight * gravity), velocity.z);
+                isGrounded = false;
+                wantsToJump = false;
+            }
+        }
+        else
+        {
+            Vector3 force = input;
+
+            force = Camera.main.transform.TransformDirection(force);
+
+            rigidbody.AddForce(force, ForceMode.Acceleration);
         }
     }
-
-    Vector3 groundRigidbodyVelocity;
 
     void Update()
     {
         // check if the player is touching a surface below them
-        checkGrounded();
+        CheckGrounded();
 
         isRunning = isGrounded && Input.GetKey(KeyCode.LeftShift);
+
+        if (Input.GetButtonDown("Jump"))
+            wantsToJump = true;
     }
 
-    Rigidbody groundRigidbody;
-    Vector3 groundHitPoint;
-
-    void checkGrounded()
+    void CheckGrounded()
     {
-        /* ==============
-         * REMEMBER
-         * ==============
-         * If you change the size of the prefab, you may have
-         * to change the length of the ray to ensure it hits
-         * the ground.
-         * 
-         * All obstacles/walls/floors must have rigidbodies
-         * attached to them. If not, Unity physics may get
-         * confused and the player can jump really high
-         * when in a corner between 2 walls for example.
-         */
-        float rayLength = 0.7f;
         RaycastHit hit;
-        Ray ray = new Ray(transform.position, -transform.up);
-        //Debug.DrawRay(ray.origin, ray.direction * rayLength);
-        // if there is something directly below the player
-        if (Physics.Raycast(ray, out hit, rayLength))
+        if (Physics.Raycast(transform.position, -transform.up, out hit, groundingRayLength))
         {
             isGrounded = true;
 
             groundHitPoint = hit.point;
             groundRigidbody = hit.rigidbody;
         }
-
     }
-
-
-
 }

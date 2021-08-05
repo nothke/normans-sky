@@ -56,7 +56,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Ramp:
-        m_Texture: {fileID: 2800000, guid: d440902fad11e807d00044888d76c639, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6c9a2d3a1b0f2c742b1b264cf52334b8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
