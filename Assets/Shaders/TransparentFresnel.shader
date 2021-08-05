@@ -10,7 +10,7 @@
 	{
 		Tags{ "Queue" = "Transparent" }
 
-		Cull Back
+		Cull Front
 		Blend One One
 
 		CGPROGRAM

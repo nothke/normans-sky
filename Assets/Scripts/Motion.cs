@@ -19,17 +19,6 @@ public class Motion : MonoBehaviour
     public float jumpForce = 1000;
     public float rotationForce = 10;
 
-
-    /*
-    public Text speedText;
-    public Text xText;
-    public Text yText;
-    public Text zText;
-    public Text sxText;
-    public Text syText;
-    public Text szText;
-    */
-
     private float originalAngularDrag;
     private float originalDrag;
 
@@ -37,44 +26,12 @@ public class Motion : MonoBehaviour
 
     public ParticleSystem speedticle;
 
-    /*
-    public struct PositionDouble
-    {
-        public double x, y;
-
-        public PositionDouble(double x, double y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-
-        public PositionDouble(Vector3 v3)
-        {
-            this.x = v3.x;
-            this.y = v3.z;
-        }
-
-        public void AddPosition(Vector3 v3)
-        {
-            this.x += v3.x;
-            this.y += v3.z;
-        }
-    }*/
-
-    //public PositionDouble realPosition;
-
     public Vector3d curRealPosition;
     public Vector3d realPosition;
 
     public int curSectorX;
     public int curSectorY;
     public float sectorSize = 5000;
-
-    /*
-    GameObject[] GetAllObjects()
-    {
-        return GameObject.FindObjectOfType(typeof(GameObject)) as GameObject[];
-    }*/
 
     void Awake() { e = this; }
 
@@ -122,13 +79,6 @@ public class Motion : MonoBehaviour
 #endif
     }
 
-    public void GetAllObjects()
-    {
-        GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
-
-        Transform[] transforms = Transform.FindObjectsOfType(typeof(Transform)) as Transform[];
-    }
-
     public Camera worldCamera;
 
     public float airDensity;
@@ -159,18 +109,11 @@ public class Motion : MonoBehaviour
         {
             if (worldCamera)
             {
-                //float altitude = Vector3.Distance(transform.position, currentPlanet.transform.position) - currentPlanet.radius;
-
-
-
                 if (altitude < currentPlanet.atmosphereHeight)
                 {
                     Vector3 normalDir = Vector3.Normalize(transform.position - currentPlanet.transform.position);
 
-                    //var localVelocity = transform.InverseTransformDirection(rb.velocity);
                     float ForwardSpeed = Mathf.Max(0, localVelocity.z);
-
-
 
                     // "Aerodynamic" calculations. This is a very simple approximation of the effect that a plane
                     // will naturally try to align itself in the direction that it's facing when moving at speed.
@@ -197,26 +140,16 @@ public class Motion : MonoBehaviour
                         //rb.rotation = Quaternion.Slerp(rb.rotation,
                         //Quaternion.LookRotation(rb.velocity, normalDir),
                         //aerodynamicEffect * Time.deltaTime);
-
-
                     }
-
-
 
                     RenderSettings.fog = true;
                     RenderSettings.fogColor = currentPlanet.atmosphereColor;
-
-
 
                     float percent = 1 - ((altitude / currentPlanet.atmosphereHeight));
                     airDensity = percent;
 
                     worldCamera.backgroundColor = Color.Lerp(Color.black, currentPlanet.atmosphereColor, percent);
                     RenderSettings.fogDensity = (percent * percent) / 100;
-
-                    //Debug.Log(altitude + " " + altitude / currentPlanet.atmosphereHeight);
-
-                    //rb.drag = airDensity;
                 }
                 else
                 {
