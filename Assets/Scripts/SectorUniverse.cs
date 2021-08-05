@@ -54,6 +54,7 @@ public class SectorUniverse : MonoBehaviour
 
     [Header("Generator Prefabs")]
     public bool generate = false;
+    public bool generateRings;
     public GameObject starPrefab;
     public GameObject planetPrefab;
 
@@ -335,14 +336,15 @@ public class SectorUniverse : MonoBehaviour
 
                     PlanetEntity planet = planetGO.GetComponent<PlanetEntity>();
 
-                    planet.radius = Random.Range(minPlanetRadius, maxPlanetRadius);
+                    planet.radius = sector.planetRadii[i];
 
                     if (planet.radius < gasGiantThreshold)
                     {
                         planet.type = PlanetEntity.Type.GasGiant;
 
-                        if (Random.value < 0.5f)
-                            planet.GetComponent<RingMaker>().enabled = true;
+                        if (generateRings)
+                            if (Random.value < 0.5f)
+                                planet.GetComponent<RingMaker>().enabled = true;
                     }
 
                     sector.star[0].planets[i] = planet;
@@ -392,10 +394,12 @@ public class SectorUniverse : MonoBehaviour
         int y = s.coordinate.y;
         int z = s.coordinate.z;
 
+        var randState = Random.state;
+
         float value = simplex.coherentNoise(x, y, z, octaves, multiplier, amplitude, lacunarity, persistence);
         value += 0.5f;
 
-        Random.seed = ("ad" + x + "_" + y + "_" + z).GetHashCode();
+        Random.InitState(("ad" + x + "_" + y + "_" + z).GetHashCode());
 
         if (value < systemProbability) // has no solar system
             return;
@@ -434,6 +438,8 @@ public class SectorUniverse : MonoBehaviour
             s.planetRadii[i] = Random.Range(minPlanetRadius, maxPlanetRadius);
             s.planetColors[i] = planetColorGradient.Evaluate(Random.value);
         }
+
+        Random.state = randState;
     }
 
     void DestroySystem(StarEntity[] stars)
@@ -522,6 +528,7 @@ public class SectorUniverse : MonoBehaviour
         }*/
     }
 
+#if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if (!preview)
@@ -540,7 +547,7 @@ public class SectorUniverse : MonoBehaviour
             {
                 if (previewSectors)
                 {
-                    Gizmos.color = Color.gray;
+                    Gizmos.color = new Color(1, 1, 1, 0.1f);
                     Gizmos.DrawWireCube(GetSectorMidPos(sector), Vector3.one * sectorSeparation);
                 }
 
@@ -560,8 +567,7 @@ public class SectorUniverse : MonoBehaviour
                         for (int i = 0; i < sector.planetPositions.Length; i++)
                         {
                             Gizmos.color = sector.planetColors[i];
-                            Gizmos.DrawSphere(sectorStartPos + sector.planetPositions[i], sector.planetRadii[i] * planetPreviewRadius);
-
+                            Gizmos.DrawSphere(sectorStartPos + sector.planetPositions[i], sector.planetRadii[i]); // planetPreviewRadius
 
                             if (drawOrbits)
                             {
@@ -576,16 +582,13 @@ public class SectorUniverse : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(Vector3.zero, Vector3.one * sectorSeparation);
     }
-
-    void Update()
-    {
-#if UNITY_EDITOR
-
-
-        if (Input.GetKeyDown(KeyCode.U))
-            Move(0, 1, 0);
-
 #endif
 
+#if UNITY_EDITOR
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.U))
+            Move(0, 1, 0);
     }
+#endif
 }
