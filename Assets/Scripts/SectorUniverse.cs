@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using VectorExtensions;
 
 public class SectorUniverse : MonoBehaviour
 {
@@ -95,7 +94,7 @@ public class SectorUniverse : MonoBehaviour
 
     public class Sector
     {
-        public Vector3i coordinate;
+        public Vector3Int coordinate;
 
         public bool hasSystem;
 
@@ -160,20 +159,20 @@ public class SectorUniverse : MonoBehaviour
         */
     }
 
-    bool CoordinateIsInsideBounds(Vector3i coord)
+    bool CoordinateIsInsideBounds(Vector3Int coord)
     {
-        Vector3i currentSector = GetCurSector();
+        Vector3Int currentSector = GetCurSector();
 
-        if (coord >= currentSector - Vector3i.one * sectorRadius &&
-            coord <= currentSector + Vector3i.one * sectorRadius)
-            return true;
+        BoundsInt bounds = new BoundsInt(
+            -sectorRadius, -sectorRadius, -sectorRadius,
+            sectorRange, sectorRange, sectorRange);
 
-        return false;
+        return bounds.Contains(coord);
     }
 
     void SmartMovePhysical(int byX, int byY, int byZ)
     {
-        Vector3i by = new Vector3i(byX, byY, byZ);
+        Vector3Int by = new Vector3Int(byX, byY, byZ);
 
         // PASS 1 - rearrange and flag
         foreach (var sector in sectors)
@@ -229,7 +228,7 @@ public class SectorUniverse : MonoBehaviour
         }
     }
 
-    void ShiftSystem(StarEntity[] stars, Vector3i by)
+    void ShiftSystem(StarEntity[] stars, Vector3Int by)
     {
         if (stars == null) return;
 
@@ -244,9 +243,9 @@ public class SectorUniverse : MonoBehaviour
         }
     }
 
-    Sector GetSectorFromWorldCoord(Vector3i coord)
+    Sector GetSectorFromWorldCoord(Vector3Int coord)
     {
-        Vector3i localCoord = coord + Vector3i.one * sectorRadius - GetCurSector();
+        Vector3Int localCoord = coord + Vector3Int.one * sectorRadius - GetCurSector();
 
         return sectors[localCoord.x, localCoord.y, localCoord.z];
     }
@@ -381,7 +380,7 @@ public class SectorUniverse : MonoBehaviour
 
         Sector s = new Sector();
 
-        s.coordinate = new Vector3i(x, y, z);
+        s.coordinate = new Vector3Int(x, y, z);
 
         CreateSector(s);
 
@@ -405,7 +404,7 @@ public class SectorUniverse : MonoBehaviour
             return;
 
         // has a solar system:
-        if (skipZero && s.coordinate == Vector3i.zero)
+        if (skipZero && s.coordinate == Vector3Int.zero)
             return;
 
         s.hasSystem = true;
@@ -461,9 +460,9 @@ public class SectorUniverse : MonoBehaviour
         }
     }
 
-    Vector3i GetCurSector()
+    Vector3Int GetCurSector()
     {
-        return new Vector3i(curSectorX, curSectorY, curSectorZ);
+        return new Vector3Int(curSectorX, curSectorY, curSectorZ);
     }
 
 
