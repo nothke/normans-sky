@@ -1714,7 +1714,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 269173335}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 6.95}
+  m_LocalPosition: {x: 0, y: 0, z: 6.15}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_Children: []
   m_Father: {fileID: 95936937}
@@ -3151,11 +3151,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunks:
   - {fileID: 195659084}
-  - {fileID: 2071243774}
-  - {fileID: 1450433183}
   - {fileID: 2012203995}
   - {fileID: 1734989125}
   - {fileID: 1413012279}
+  - {fileID: 284159940}
   shiftRange: 1000
   translateForce: 100000
   jumpForce: 100000
@@ -10171,7 +10170,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1182499818
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10488,6 +10487,64 @@ MonoBehaviour:
   maxPlanetRadius: 2000
   gasGiantThreshold: 1500
   skipZero: 1
+  starColorGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 0, b: 0, a: 1}
+    key1: {r: 1, g: 0.5176471, b: 0, a: 1}
+    key2: {r: 1, g: 0.972549, b: 0, a: 1}
+    key3: {r: 1, g: 1, b: 1, a: 0}
+    key4: {r: 0.9254902, g: 0.9529412, b: 1, a: 0}
+    key5: {r: 0, g: 0.38039216, b: 1, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 8481
+    ctime2: 15998
+    ctime3: 27178
+    ctime4: 42020
+    ctime5: 65535
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 65535
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 6
+    m_NumAlphaKeys: 2
+  planetColorGradient:
+    serializedVersion: 2
+    key0: {r: 0, g: 0, b: 0, a: 1}
+    key1: {r: 1, g: 0, b: 0, a: 1}
+    key2: {r: 1, g: 0.9490196, b: 0.654902, a: 0}
+    key3: {r: 0.67058825, g: 0.67058825, b: 0.67058825, a: 0}
+    key4: {r: 0.42745098, g: 0.38039216, b: 0.3019608, a: 0}
+    key5: {r: 0.99607843, g: 1, b: 0.6039216, a: 0}
+    key6: {r: 0, g: 0.41960785, b: 1, a: 0}
+    key7: {r: 0.13333334, g: 0.5529412, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 4626
+    ctime2: 10409
+    ctime3: 22937
+    ctime4: 40670
+    ctime5: 55127
+    ctime6: 61102
+    ctime7: 65535
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 8
+    m_NumAlphaKeys: 2
   generate: 1
   generateRings: 0
   starPrefab: {fileID: 128662, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
@@ -10713,64 +10770,6 @@ MonoBehaviour:
   orbitColor: {r: 0, g: 0.78057027, b: 1, a: 0.40392157}
   starPreviewRadius: 2000
   planetPreviewRadius: 1000
-  starColorGradient:
-    serializedVersion: 2
-    key0: {r: 1, g: 0, b: 0, a: 1}
-    key1: {r: 1, g: 0.5176471, b: 0, a: 1}
-    key2: {r: 1, g: 0.972549, b: 0, a: 1}
-    key3: {r: 1, g: 1, b: 1, a: 0}
-    key4: {r: 0.9254902, g: 0.9529412, b: 1, a: 0}
-    key5: {r: 0, g: 0.38039216, b: 1, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 8481
-    ctime2: 15998
-    ctime3: 27178
-    ctime4: 42020
-    ctime5: 65535
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 65535
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 6
-    m_NumAlphaKeys: 2
-  planetColorGradient:
-    serializedVersion: 2
-    key0: {r: 0, g: 0, b: 0, a: 1}
-    key1: {r: 1, g: 0, b: 0, a: 1}
-    key2: {r: 1, g: 0.9490196, b: 0.654902, a: 0}
-    key3: {r: 0.67058825, g: 0.67058825, b: 0.67058825, a: 0}
-    key4: {r: 0.42745098, g: 0.38039216, b: 0.3019608, a: 0}
-    key5: {r: 0.99607843, g: 1, b: 0.6039216, a: 0}
-    key6: {r: 0, g: 0.41960785, b: 1, a: 0}
-    key7: {r: 0.13333334, g: 0.5529412, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 4626
-    ctime2: 10409
-    ctime3: 22937
-    ctime4: 40670
-    ctime5: 55127
-    ctime6: 61102
-    ctime7: 65535
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 8
-    m_NumAlphaKeys: 2
 --- !u!114 &1222550244
 MonoBehaviour:
   m_ObjectHideFlags: 0

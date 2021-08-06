@@ -8,7 +8,11 @@ public class RandomVertexPaint : MonoBehaviour
 
     void Start()
     {
+        Paint();
+    }
 
+    public void Paint()
+    {
         //float hue = Random.value;
         //float cHue = hue + 0.5f;
         //if (cHue > 1) cHue -= 1;

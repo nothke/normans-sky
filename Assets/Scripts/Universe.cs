@@ -55,7 +55,7 @@ public class Universe : MonoBehaviour
 
             Vector3 systemDir = Random.onUnitSphere;
 
-            Motion.e.chunks.Add(gos.transform);
+            Motion.AddChunk(gos.transform);
 
             int numOfBodies = Random.Range(minBodies, maxBodies);
 
@@ -71,14 +71,10 @@ public class Universe : MonoBehaviour
                 go.GetComponent<RandomVertexPaint>().rC1 = duplets[randDup].primColor;
                 go.GetComponent<RandomVertexPaint>().rC2 = duplets[randDup].secColor;
 
-                Motion.e.chunks.Add(go.transform);
+                Motion.AddChunk(go.transform);
             }
-
         }
-
-
     }
-
 
     public void CreateSector(int x, int y, int z)
     {

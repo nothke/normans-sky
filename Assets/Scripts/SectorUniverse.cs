@@ -332,8 +332,7 @@ public class SectorUniverse : MonoBehaviour
 
         GameObject starGO = starPool.GetGO();
         starGO.transform.position = sectorStartPos + sector.starPostion;
-
-        if (Motion.e) Motion.e.chunks.Add(starGO.transform);
+        Motion.AddChunk(starGO.transform);
 
         // TODO: material color
 
@@ -356,15 +355,14 @@ public class SectorUniverse : MonoBehaviour
             {
                 GameObject planetGO = planetPool.GetGO();
                 planetGO.transform.position = sectorStartPos + sector.planets[i].position;
-
-                if (Motion.e)
-                    Motion.e.chunks.Add(planetGO.transform);
+                Motion.AddChunk(planetGO.transform);
 
                 PlanetEntity planet = planetGO.GetComponent<PlanetEntity>();
 
                 Debug.Assert(planet, "PlanetEntity not found on planetPrefab");
 
                 planet.radius = sector.planets[i].radius;
+                planet.UpdateRadii();
 
                 if (planet.radius < gasGiantThreshold)
                 {
@@ -374,6 +372,9 @@ public class SectorUniverse : MonoBehaviour
                         if (Random.value < 0.5f)
                             planet.GetComponent<RingMaker>().enabled = true;
                 }
+
+                planet.painter.rC1 = sector.planets[i].color;
+                planet.painter.Paint();
 
                 Debug.Assert(star.planets != null, "Planets are null");
 
@@ -482,9 +483,11 @@ public class SectorUniverse : MonoBehaviour
 
             foreach (var planet in star.planets)
             {
+                Motion.RemoveChunk(planet.transform);
                 planetPool.Release(planet.gameObject);
             }
 
+            Motion.RemoveChunk(star.transform);
             starPool.Release(star.gameObject);
 
             stars[i] = null;

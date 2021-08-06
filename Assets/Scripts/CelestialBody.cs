@@ -34,8 +34,6 @@ public class CelestialBody : MonoBehaviour
 
     public virtual void OnValidate()
     {
-        mass = CalculateMass(radius, density);
-
         UpdateRadii();
     }
 
@@ -51,5 +49,7 @@ public class CelestialBody : MonoBehaviour
     {
         if (body)
             body.localScale = Vector3.one * radius / baseRadius;
+
+        mass = CalculateMass(radius, density);
     }
 }

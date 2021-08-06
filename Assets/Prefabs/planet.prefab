@@ -91,9 +91,9 @@ GameObject:
   - component: {fileID: 3327938}
   - component: {fileID: 2378328}
   - component: {fileID: 13526214}
+  - component: {fileID: 11441224}
   - component: {fileID: 11482226}
   - component: {fileID: 11412982}
-  - component: {fileID: 11441224}
   m_Layer: 0
   m_Name: planet
   m_TagString: Untagged
@@ -176,6 +176,34 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 10.000002
   m_Center: {x: 0.0000009536743, y: 0.0000004768373, z: 0}
+--- !u!114 &11441224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 197542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24854b28f71ec654f8265597e9f59881, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  name: unnamed
+  radius: 1000
+  density: 5500.49
+  mass: 2.3040342e+10
+  body: {fileID: 444594}
+  gravity: {fileID: 0}
+  random: 0
+  atmosphere: 1
+  atmosphereColor: {r: 0.5293036, g: 0.6700275, b: 0.8088235, a: 1}
+  atmosphereHeight: 60
+  atmoSphereSphere: {fileID: 486350}
+  type: 0
+  rain: 0
+  thunder: 0
+  snow: 0
+  painter: {fileID: 11482226}
 --- !u!114 &11482226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,30 +235,3 @@ MonoBehaviour:
   gravityRange: 2000
   drawGizmos: 0
   force: 0
---- !u!114 &11441224
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 197542}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24854b28f71ec654f8265597e9f59881, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  name: unnamed
-  radius: 1000
-  density: 5500.49
-  mass: 2.3040342e+10
-  body: {fileID: 444594}
-  gravity: {fileID: 0}
-  random: 0
-  atmosphere: 1
-  atmosphereColor: {r: 0.5293036, g: 0.6700275, b: 0.8088235, a: 1}
-  atmosphereHeight: 60
-  atmoSphereSphere: {fileID: 486350}
-  type: 0
-  rain: 0
-  thunder: 0
-  snow: 0

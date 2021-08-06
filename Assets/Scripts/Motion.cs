@@ -40,6 +40,18 @@ public class Motion : MonoBehaviour
     public float velocity;
     public float altitude;
 
+    public static void AddChunk(Transform chunk)
+    {
+        if (e)
+            e.chunks.Add(chunk);
+    }
+
+    public static void RemoveChunk(Transform chunk)
+    {
+        if (e)
+            e.chunks.Remove(chunk);
+    }
+
     void Start()
     {
         ShiftOrigin();
