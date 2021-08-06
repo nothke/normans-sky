@@ -90,6 +90,7 @@ public class SectorUniverse : MonoBehaviour
             public float radius;
             public Vector3 position;
             public Color color;
+            public Color secondaryColor;
         }
 
         public List<Planet> planets;
@@ -376,6 +377,7 @@ public class SectorUniverse : MonoBehaviour
                 }
 
                 planet.painter.rC1 = sector.planets[i].color;
+                planet.painter.rC2 = sector.planets[i].secondaryColor;
                 planet.painter.Paint();
 
                 Debug.Assert(star.planets != null, "Planets are null");
@@ -471,7 +473,8 @@ public class SectorUniverse : MonoBehaviour
                 orbitRadius = orbitRadius,
                 position = s.starPostion + pos,
                 radius = Random.Range(minPlanetRadius, maxPlanetRadius), // TODO: Should be relative to type? Gas giants should be bigger
-                color = planetColorGradient.Evaluate(Random.value)
+                color = planetColorGradient.Evaluate(Random.value),
+                secondaryColor = Random.ColorHSV()
             });
         }
 
