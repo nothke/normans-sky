@@ -204,7 +204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf0bc4230a10ac468cfeae0ca3f1246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentSector: {x: 0, y: 0, z: 0}
+  currentSector: {x: -1, y: 0, z: 0}
   sectorRadius: 2
   sectorSeparation: 50000
   octaves: 3
@@ -504,7 +504,7 @@ MonoBehaviour:
   previewNames: 0
   orbitColor: {r: 0, g: 0.78057027, b: 1, a: 0.40392157}
   starPreviewRadius: 2000
-  planetPreviewRadius: 1000
+  planetPreviewRadius: 1
 --- !u!4 &267335162
 Transform:
   m_ObjectHideFlags: 0

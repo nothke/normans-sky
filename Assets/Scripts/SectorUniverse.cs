@@ -84,16 +84,24 @@ public class SectorUniverse : MonoBehaviour
         public Vector3 starPostion;
         public Color starColor;
 
-        public float[] planetOrbits;
-        public float[] planetRadii;
-        public Vector3[] planetPositions;
-        public Color[] planetColors;
+        public struct Planet
+        {
+            public float orbitRadius;
+            public float radius;
+            public Vector3 position;
+            public Color color;
+        }
 
-        //public StarEntity star;
+        public List<Planet> planets;
+
         public StarEntity[] star;
-        //public StarEntity newStar;
         public StarEntity[] newStar;
         public bool flagDestroy;
+
+        public Sector(int maxPlanets)
+        {
+            planets = new List<Planet>(maxPlanets);
+        }
     }
 
     SimplexNoiseGenerator simplex;
@@ -327,17 +335,17 @@ public class SectorUniverse : MonoBehaviour
 
             StarEntity star = sector.star[0];
 
-            if (sector.planetPositions.Length > 0)
+            if (sector.planets.Count > 0)
             {
                 if (star.planets == null)
                     star.planets = new List<PlanetEntity>(maxPlanets);
 
                 star.planets.Clear();
 
-                for (int i = 0; i < sector.planetPositions.Length; i++)
+                for (int i = 0; i < sector.planets.Count; i++)
                 {
                     GameObject planetGO = planetPool.GetGO();
-                    planetGO.transform.position = sectorStartPos + sector.planetPositions[i];
+                    planetGO.transform.position = sectorStartPos + sector.planets[i].position;
 
                     if (Motion.e)
                         Motion.e.chunks.Add(planetGO.transform);
@@ -346,7 +354,7 @@ public class SectorUniverse : MonoBehaviour
 
                     Debug.Assert(planet, "PlanetEntity not found on planetPrefab");
 
-                    planet.radius = sector.planetRadii[i];
+                    planet.radius = sector.planets[i].radius;
 
                     if (planet.radius < gasGiantThreshold)
                     {
@@ -390,7 +398,7 @@ public class SectorUniverse : MonoBehaviour
     {
         CreateGeneratorIfNeeded();
 
-        Sector s = new Sector();
+        Sector s = new Sector(maxPlanets);
         s.coordinate = coord;
 
         CreateSector(s);
@@ -431,23 +439,22 @@ public class SectorUniverse : MonoBehaviour
         s.orbitNormal = Random.insideUnitSphere.normalized;
 
         int planetsNum = Random.Range(0, maxPlanets);
-        s.planetOrbits = new float[planetsNum];
-        s.planetPositions = new Vector3[planetsNum];
-        s.planetColors = new Color[planetsNum];
-        s.planetRadii = new float[planetsNum];
 
         float orbitRadius = minPlanetRange;
 
         for (int i = 0; i < planetsNum; i++)
         {
             orbitRadius += Random.Range(minPlanetSeparation, minPlanetSeparation * (Mathf.Pow(i + 1, nextPlanetPower)));
-            s.planetOrbits[i] = orbitRadius;
 
             Vector3 pos = RandomPointOnPlane(s.orbitNormal, orbitRadius);
 
-            s.planetPositions[i] = s.starPostion + pos;
-            s.planetRadii[i] = Random.Range(minPlanetRadius, maxPlanetRadius);
-            s.planetColors[i] = planetColorGradient.Evaluate(Random.value);
+            s.planets.Add(new Sector.Planet()
+            {
+                orbitRadius = orbitRadius,
+                position = s.starPostion + pos,
+                radius = Random.Range(minPlanetRadius, maxPlanetRadius), // TODO: Should be relative to type? Gas giants should be bigger
+                color = planetColorGradient.Evaluate(Random.value)
+            });
         }
 
         Random.state = randState;
@@ -557,16 +564,22 @@ public class SectorUniverse : MonoBehaviour
                     if (previewNames)
                         UnityEditor.Handles.Label(sectorStartPos + sector.starPostion, sector.name);
 
-                    if (previewPlanets && sector.planetPositions.Length > 0)
+                    if (previewPlanets && sector.planets.Count > 0)
                     {
-                        for (int i = 0; i < sector.planetPositions.Length; i++)
+                        for (int i = 0; i < sector.planets.Count; i++)
                         {
-                            Gizmos.color = sector.planetColors[i];
-                            Gizmos.DrawSphere(sectorStartPos + sector.planetPositions[i], sector.planetRadii[i]); // planetPreviewRadius
+                            var p = sector.planets[i];
+
+                            Gizmos.color = p.color;
+                            Gizmos.DrawSphere(sectorStartPos + p.position,
+                                p.radius * planetPreviewRadius);
 
                             if (drawOrbits)
                             {
-                                UnityEditor.Handles.DrawWireDisc(sectorStartPos + sector.starPostion, sector.orbitNormal, sector.planetOrbits[i]);
+                                UnityEditor.Handles.DrawWireDisc(
+                                    sectorStartPos + sector.starPostion,
+                                    sector.orbitNormal,
+                                    p.orbitRadius);
                             }
                         }
                     }
