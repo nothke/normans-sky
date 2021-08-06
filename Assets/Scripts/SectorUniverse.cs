@@ -235,10 +235,11 @@ public class SectorUniverse : MonoBehaviour
             sector.newStar = null;
 
             // and recreate sector data
-            CreateSector(sector);
+            RegenerateSector(sector);
 
-            // if sector has no physical star, create new one
-            if (sector.star == null)
+            // if sector should have a physical star,
+            // and doesn't have one (meaning it's a new in-bounds sector), create the star
+            if (sector.hasSystem && sector.star == null)
                 GeneratePhysical(sector);
         }
     }
@@ -316,59 +317,67 @@ public class SectorUniverse : MonoBehaviour
 
     void GeneratePhysical(Sector sector)
     {
-        if (sector.hasSystem)
+        if (!sector.hasSystem)
         {
-            Vector3 sectorStartPos = GetSectorStartPos(sector);
-
-            GameObject starGO = starPool.GetGO();
-            starGO.transform.position = sectorStartPos + sector.starPostion;
-
-            if (Motion.e) Motion.e.chunks.Add(starGO.transform);
-
-            // TODO: material color
-
-            // if not a nebula generate only one star
-            if (sector.star == null)
-                sector.star = new StarEntity[1];
-
-            sector.star[0] = starGO.GetComponent<StarEntity>();
-
-            StarEntity star = sector.star[0];
-
-            if (sector.planets.Count > 0)
+            if (sector.star != null)
             {
-                if (star.planets == null)
-                    star.planets = new List<PlanetEntity>(maxPlanets);
+                Debug.LogWarning("Sector should have released the stars long ago! No matter, releasing now");
+                ReleaseStarSystem(sector.star);
+            }
 
-                star.planets.Clear();
+            return;
+        }
 
-                for (int i = 0; i < sector.planets.Count; i++)
+        Vector3 sectorStartPos = GetSectorStartPos(sector);
+
+        GameObject starGO = starPool.GetGO();
+        starGO.transform.position = sectorStartPos + sector.starPostion;
+
+        if (Motion.e) Motion.e.chunks.Add(starGO.transform);
+
+        // TODO: material color
+
+        // if not a nebula generate only one star
+        if (sector.star == null)
+            sector.star = new StarEntity[1];
+
+        sector.star[0] = starGO.GetComponent<StarEntity>();
+
+        StarEntity star = sector.star[0];
+
+        if (sector.planets.Count > 0)
+        {
+            if (star.planets == null)
+                star.planets = new List<PlanetEntity>(maxPlanets);
+
+            star.planets.Clear();
+
+            for (int i = 0; i < sector.planets.Count; i++)
+            {
+                GameObject planetGO = planetPool.GetGO();
+                planetGO.transform.position = sectorStartPos + sector.planets[i].position;
+
+                if (Motion.e)
+                    Motion.e.chunks.Add(planetGO.transform);
+
+                PlanetEntity planet = planetGO.GetComponent<PlanetEntity>();
+
+                Debug.Assert(planet, "PlanetEntity not found on planetPrefab");
+
+                planet.radius = sector.planets[i].radius;
+
+                if (planet.radius < gasGiantThreshold)
                 {
-                    GameObject planetGO = planetPool.GetGO();
-                    planetGO.transform.position = sectorStartPos + sector.planets[i].position;
+                    planet.type = PlanetEntity.Type.GasGiant;
 
-                    if (Motion.e)
-                        Motion.e.chunks.Add(planetGO.transform);
-
-                    PlanetEntity planet = planetGO.GetComponent<PlanetEntity>();
-
-                    Debug.Assert(planet, "PlanetEntity not found on planetPrefab");
-
-                    planet.radius = sector.planets[i].radius;
-
-                    if (planet.radius < gasGiantThreshold)
-                    {
-                        planet.type = PlanetEntity.Type.GasGiant;
-
-                        if (generateRings)
-                            if (Random.value < 0.5f)
-                                planet.GetComponent<RingMaker>().enabled = true;
-                    }
-
-                    Debug.Assert(star.planets != null, "Planets are null");
-
-                    star.planets.Add(planet);
+                    if (generateRings)
+                        if (Random.value < 0.5f)
+                            planet.GetComponent<RingMaker>().enabled = true;
                 }
+
+                Debug.Assert(star.planets != null, "Planets are null");
+
+                star.planets.Add(planet);
             }
         }
     }
@@ -401,12 +410,12 @@ public class SectorUniverse : MonoBehaviour
         Sector s = new Sector(maxPlanets);
         s.coordinate = coord;
 
-        CreateSector(s);
+        RegenerateSector(s);
 
         return s;
     }
 
-    void CreateSector(Sector s)
+    void RegenerateSector(Sector s)
     {
         int x = s.coordinate.x;
         int y = s.coordinate.y;
@@ -418,6 +427,8 @@ public class SectorUniverse : MonoBehaviour
         value += 0.5f;
 
         Random.InitState(("ad" + x + "_" + y + "_" + z).GetHashCode());
+
+        s.planets.Clear();
 
         if (skipZero && s.coordinate == Vector3Int.zero)
             return;
@@ -462,7 +473,8 @@ public class SectorUniverse : MonoBehaviour
 
     void ReleaseStarSystem(StarEntity[] stars)
     {
-        if (stars == null || stars.Length == 0) return;
+        if (stars == null || stars.Length == 0)
+            return;
 
         for (int i = 0; i < stars.Length; i++)
         {
