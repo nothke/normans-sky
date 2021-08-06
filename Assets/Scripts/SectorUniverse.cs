@@ -351,6 +351,8 @@ public class SectorUniverse : MonoBehaviour
 
             star.planets.Clear();
 
+            star.renderer.material.color = sector.starColor * 2;
+
             for (int i = 0; i < sector.planets.Count; i++)
             {
                 GameObject planetGO = planetPool.GetGO();
@@ -447,6 +449,10 @@ public class SectorUniverse : MonoBehaviour
         s.starSize = (value - 0.5f) * 2;
 
         s.starColor = starColorGradient.Evaluate(s.starSize);
+        {
+            Color.RGBToHSV(s.starColor, out float h, out float _s, out float v);
+            s.starColor = Color.HSVToRGB(h + Random.value * 0.05f, _s * 0.7f, v);
+        }
 
         s.orbitNormal = Random.insideUnitSphere.normalized;
 

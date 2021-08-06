@@ -114,6 +114,7 @@ MonoBehaviour:
   mass: 622033.8
   body: {fileID: 0}
   gravity: {fileID: 0}
+  renderer: {fileID: 2349664}
   planets: []
 --- !u!114 &11418786
 MonoBehaviour:
