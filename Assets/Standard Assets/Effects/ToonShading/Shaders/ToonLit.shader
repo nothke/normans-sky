@@ -26,7 +26,8 @@ inline half4 LightingToonRamp (SurfaceOutput s, half3 lightDir, half atten)
 	half d = dot (s.Normal, lightDir)*0.5 + 0.5;
 	d *= ceil(atten);
 	half3 ramp = tex2D (_Ramp, float2(d,d)).rgb;
-	
+	ramp = clamp(ramp, 0.2, 1);
+
 	half4 c;
 	c.rgb = s.Albedo * _LightColor0.rgb * ramp;// * (atten * 2);
 	c.a = 0;

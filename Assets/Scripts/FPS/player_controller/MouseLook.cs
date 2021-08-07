@@ -33,7 +33,7 @@ public class MouseLook : MonoBehaviour
 
     private float rotationY = 0f;
 
-    void Update()
+    void FixedUpdate()
     {
         if (axes == RotationAxes.MouseXAndY)
         {
@@ -65,8 +65,6 @@ public class MouseLook : MonoBehaviour
 
             transform.localEulerAngles = new Vector3(-rotationY, transform.localEulerAngles.y, 0);
         }
-
-
     }
 
     void Start()
