@@ -194,8 +194,8 @@ public class Motion : MonoBehaviour
             rb.drag = originalDrag;
 
         Vector3 forceInput = new Vector3(
-            Input.GetAxis("Vertical"),
             Input.GetAxis("Horizontal"),
+            Input.GetAxis("Vertical"),
             Input.GetAxis("Forward"));
 
         Vector3 torqueInput = new Vector3(
