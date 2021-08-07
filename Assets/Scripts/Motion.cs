@@ -15,7 +15,7 @@ public class Motion : MonoBehaviour
     public List<Transform> chunks = new List<Transform>();
     public float shiftRange = 10;
     public float translateForce = 100000;
-    private float force;
+    private float forceMult;
     public float jumpForce = 1000;
     public float rotationForce = 10;
 
@@ -114,65 +114,51 @@ public class Motion : MonoBehaviour
         velocity = rb.velocity.magnitude;
         Vector3 localVelocity = transform.InverseTransformDirection(rb.velocity);
 
-        altitude = 100000;
+        Vector3 pos = transform.position;
 
-        if (currentPlanet)
-            altitude = Vector3.Distance(transform.position, currentPlanet.transform.position) - currentPlanet.radius;
+        altitude = !currentPlanet ? Mathf.Infinity :
+            Vector3.Distance(pos, currentPlanet.transform.position) - currentPlanet.radius;
 
-        if (currentPlanet && currentPlanet.atmosphere)
+        airDensity = !currentPlanet ? 0 : 1 - (altitude / currentPlanet.atmosphereHeight);
+
+        float forwardSpeed = Mathf.Max(0, localVelocity.z);
+
+        if (currentPlanet && currentPlanet.atmosphere && airDensity > 0 && velocity > 0)
         {
-            if (worldCamera)
+            aeroFactor = Vector3.Dot(transform.forward, rb.velocity.normalized);
+            aeroFactor *= aeroFactor;
+
+            float aerodynamicEffect = 0.5f;
+
+            aerodynamicEffect *= airDensity;
+
+            var newVelocity = Vector3.Lerp(
+                rb.velocity,
+                transform.forward * forwardSpeed,
+                aeroFactor * forwardSpeed * aerodynamicEffect * Time.deltaTime);
+
+            rb.velocity = newVelocity;
+        }
+
+        // Fog effects
+        if (worldCamera)
+        {
+            if (airDensity > 0)
             {
-                if (altitude < currentPlanet.atmosphereHeight)
-                {
-                    Vector3 normalDir = Vector3.Normalize(transform.position - currentPlanet.transform.position);
+                RenderSettings.fog = true;
+                RenderSettings.fogColor = currentPlanet.atmosphereColor;
 
-                    float ForwardSpeed = Mathf.Max(0, localVelocity.z);
-
-                    // "Aerodynamic" calculations. This is a very simple approximation of the effect that a plane
-                    // will naturally try to align itself in the direction that it's facing when moving at speed.
-                    // Without this, the plane would behave a bit like the asteroids spaceship!
-                    if (velocity > 0)
-                    {
-                        // compare the direction we're pointing with the direction we're moving:
-                        aeroFactor = Vector3.Dot(transform.forward, rb.velocity.normalized);
-                        // multipled by itself results in a desirable rolloff curve of the effect
-                        aeroFactor *= aeroFactor;
-
-                        float aerodynamicEffect = 0.5f;
-
-                        aerodynamicEffect *= airDensity;
-
-                        // Finally we calculate a new velocity by bending the current velocity direction towards
-                        // the the direction the plane is facing, by an amount based on this aeroFactor
-                        var newVelocity = Vector3.Lerp(rb.velocity, transform.forward * ForwardSpeed,
-                                                       aeroFactor * ForwardSpeed * aerodynamicEffect * Time.deltaTime);
-                        rb.velocity = newVelocity;
-
-                        // also rotate the plane towards the direction of movement - this should be a very small effect, but means the plane ends up
-                        // pointing downwards in a stall
-                        //rb.rotation = Quaternion.Slerp(rb.rotation,
-                        //Quaternion.LookRotation(rb.velocity, normalDir),
-                        //aerodynamicEffect * Time.deltaTime);
-                    }
-
-                    RenderSettings.fog = true;
-                    RenderSettings.fogColor = currentPlanet.atmosphereColor;
-
-                    float percent = 1 - ((altitude / currentPlanet.atmosphereHeight));
-                    airDensity = percent;
-
-                    worldCamera.backgroundColor = Color.Lerp(Color.black, currentPlanet.atmosphereColor, percent);
-                    RenderSettings.fogDensity = (percent * percent) / 100;
-                }
-                else
-                {
-                    worldCamera.backgroundColor = Color.black;
-                    RenderSettings.fog = false;
-                    airDensity = 0;
-                }
+                worldCamera.backgroundColor = Color.Lerp(Color.black, currentPlanet.atmosphereColor, airDensity);
+                RenderSettings.fogDensity = (airDensity * airDensity) / 100;
+            }
+            else
+            {
+                worldCamera.backgroundColor = Color.black;
+                RenderSettings.fog = false;
+                airDensity = 0;
             }
         }
+
         else RenderSettings.fog = false;
 
         // Movement
@@ -188,7 +174,7 @@ public class Motion : MonoBehaviour
 
             if (airDensity == 0)
             {
-                force = translateForce * 10;
+                forceMult = translateForce * 10;
 
                 if (Input.GetAxis("Forward") > 0)
                     hyperTarget = 1;
@@ -197,22 +183,15 @@ public class Motion : MonoBehaviour
         else
         {
             float airFactor = Mathf.Clamp(1 - airDensity, 0.25f, 1);
-
-
             rb.angularDrag = originalAngularDrag * (1 + airDensity) * (1 + speedFactor);
-
-
-            force = translateForce * airFactor;
-
-            //Debug.Log(airFactor);
+            forceMult = translateForce * airFactor;
         }
 
-
-
+        // Airbrake / spacebrake
         if (Input.GetKey(KeyCode.Space))
-            GetComponent<Rigidbody>().drag = 1;
+            rb.drag = 1;
         else
-            GetComponent<Rigidbody>().drag = originalDrag;
+            rb.drag = originalDrag;
 
         Vector3 forceInput = new Vector3(
             Input.GetAxis("Vertical"),
@@ -224,37 +203,29 @@ public class Motion : MonoBehaviour
             Input.GetAxis("Yaw"),
             Input.GetAxis("Roll"));
 
-        force /= 60.0f;
-        rb.AddRelativeForce(forceInput * force * (1 + airDensity * 2));
+        Vector3 relForce = forceInput;
+        relForce.y *= 1 + airDensity * 2;
+
+        forceMult /= 60.0f;
+        rb.AddRelativeForce(relForce * forceMult);
 
         float torqueMult = rotationForce * (1 + 5 * airDensity) * (1 + speedFactor) / 60.0f;
 
         rb.AddRelativeTorque(torqueInput * torqueMult, ForceMode.Acceleration);
 
-        /*
-        GetComponent<Rigidbody>().AddForce(Input.GetAxis("Vertical") * transform.up * Time.deltaTime * force * (1 + airDensity * 2));
-        GetComponent<Rigidbody>().AddForce(Input.GetAxis("Horizontal") * transform.right * Time.deltaTime * force);
-        GetComponent<Rigidbody>().AddForce(Input.GetAxis("Forward") * transform.forward * Time.deltaTime * force);
+        UpdateShift();
 
-        //Debug.Log(torqueMult);
-
-        GetComponent<Rigidbody>().AddTorque(Input.GetAxis("Roll") * transform.forward * torqueMult, ForceMode.Acceleration);
-        GetComponent<Rigidbody>().AddTorque(Input.GetAxis("Yaw") * transform.up * torqueMult, ForceMode.Acceleration);
-        GetComponent<Rigidbody>().AddTorque(Input.GetAxis("Pitch") * transform.right * torqueMult, ForceMode.Acceleration);
-        */
+        // Audio
 
         float rcsTarget = 0;
         float mainEngineTarget = 0;
 
-
-        if (Input.GetAxis("Roll") != 0 || Input.GetAxis("Yaw") != 0 || Input.GetAxis("Pitch") != 0 || Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+        if (torqueInput != Vector3.zero ||
+            forceInput != Vector3.zero)
         {
-            //rb.angularDrag = 1;
-
             if (airDensity == 0)
                 rcsTarget = 1;
         }
-
 
         if (Input.GetAxis("Forward") != 0)
             mainEngineTarget = 1;
@@ -267,15 +238,6 @@ public class Motion : MonoBehaviour
             speedticle.SetEmissionRate(Mathf.Clamp(velocity - 40, 0, 200));
         else
             speedticle.SetEmissionRate(0);
-
-        //DebugAxes();
-
-
-
-
-        UpdateShift();
-
-        //Output();
     }
 
     void UpdateShift()
@@ -302,7 +264,6 @@ public class Motion : MonoBehaviour
         //Debug.Log(normalizedSectorPos);
 
         const float extent = 0.5f;
-
 
         if (normalizedSectorPos.x < -extent)
             SectorUniverse.e.Move(-1, 0, 0, true);
