@@ -8,7 +8,7 @@ using System.Collections;
 public class PixelBoy : MonoBehaviour
 {
     public int h = 64;
-    int w;
+    int w = 64; // 64 just to prevent 0 sized texture error
 
 #if !UNITY_2018_1_OR_NEWER
     protected void Start()
