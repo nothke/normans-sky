@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Nothke.Collections;
+using SkyUtils;
 
 public class SectorUniverse : MonoBehaviour
 {
@@ -105,6 +106,8 @@ public class SectorUniverse : MonoBehaviour
         }
     }
 
+    public Vector3d offset;
+
     SimplexNoiseGenerator simplex;
     int sectorRange = -1;
 
@@ -170,23 +173,21 @@ public class SectorUniverse : MonoBehaviour
                 }
             }
         }
+
+        Debug.Log("Created sectors");
     }
 
-    void Move(int byX, int byY, int byZ)
+    public void Move(int byX, int byY, int byZ, bool doOffset = false)
     {
-        Move(new Vector3Int(byX, byY, byZ));
+        Move(new Vector3Int(byX, byY, byZ), doOffset);
     }
 
-    void Move(Vector3Int by)
+    public void Move(Vector3Int by, bool doOffset = false)
     {
-        SmartMovePhysical(by);
+        if (doOffset)
+            offset += (Vector3)by * sectorSeparation;
 
-        /*
-        ClearAllSectors();
-        CreateAllSectors();
-
-        GeneratePhysical();
-        */
+        SmartMovePhysical(by, !doOffset);
     }
 
     bool CoordinateIsInsideBounds(Vector3Int coord)
@@ -198,7 +199,7 @@ public class SectorUniverse : MonoBehaviour
         return bounds.Contains(coord - currentSector);
     }
 
-    void SmartMovePhysical(Vector3Int by)
+    void SmartMovePhysical(Vector3Int by, bool shiftPersistingSystems = true)
     {
         // PASS 1 - Move stars and release out of bounds stars
         foreach (var sector in sectors)
@@ -210,7 +211,8 @@ public class SectorUniverse : MonoBehaviour
                 nextSector.newStar = sector.star;
 
                 // ..and move it if it has any star
-                ShiftSystem(nextSector.newStar, -by);
+                if (shiftPersistingSystems)
+                    ShiftSystem(nextSector.newStar, -by);
             }
             else
             {
@@ -528,7 +530,7 @@ public class SectorUniverse : MonoBehaviour
         Vector3 relativeSector = new Vector3(x - currentSector.x, y - currentSector.y, z - currentSector.z);
         //relativeSector -= Vector3.one * (0.5f * sectorRange - 0.5f); // OLD calc
 
-        return relativeSector * sectorSeparation;
+        return relativeSector * sectorSeparation + (Vector3)offset;
     }
 
     Vector3 GetSectorStartPos(Sector s)
@@ -543,12 +545,15 @@ public class SectorUniverse : MonoBehaviour
 
     void OnValidate()
     {
-        CreateAllSectors();
-
-        if (updateNames == true)
+        if (!Application.isPlaying)
         {
-            UpdateNames();
-            updateNames = false;
+            CreateAllSectors();
+
+            if (updateNames == true)
+            {
+                UpdateNames();
+                updateNames = false;
+            }
         }
     }
 
@@ -612,7 +617,7 @@ public class SectorUniverse : MonoBehaviour
         }
 
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(Vector3.zero, Vector3.one * sectorSeparation);
+        Gizmos.DrawWireCube((Vector3)offset, Vector3.one * sectorSeparation);
     }
 #endif
 
@@ -620,7 +625,7 @@ public class SectorUniverse : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.U))
-            Move(0, 1, 0);
+            Move(0, 1, 0, true);
     }
 #endif
 }

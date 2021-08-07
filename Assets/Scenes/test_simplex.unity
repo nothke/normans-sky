@@ -496,7 +496,7 @@ MonoBehaviour:
   - ond
   - illon
   initOnStart: 1
-  preview: 0
+  preview: 1
   previewSectors: 1
   previewSystems: 1
   previewPlanets: 1

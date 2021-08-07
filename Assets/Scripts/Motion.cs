@@ -27,7 +27,7 @@ public class Motion : MonoBehaviour
     public ParticleSystem speedticle;
 
     public Vector3d curRealPosition;
-    public Vector3d realPosition;
+    public Vector3d originOffset;
 
     public int curSectorX;
     public int curSectorY;
@@ -65,12 +65,12 @@ public class Motion : MonoBehaviour
     void ShiftOrigin()
     {
         // Add current position to realPosition
-        if (realPosition == Vector3d.zero)
+        if (originOffset == Vector3d.zero)
         {
-            realPosition = new Vector3d(transform.position);
+            originOffset = new Vector3d(transform.position);
         }
         else
-            realPosition += transform.position;
+            originOffset += transform.position;
 
         Vector3 relativePosition = transform.position;
 
@@ -89,6 +89,8 @@ public class Motion : MonoBehaviour
 #if TimedTrailRenderer
         ShiftTrailVertices(-relativePosition);
 #endif
+
+        SectorUniverse.e.offset -= relativePosition;
     }
 
     public Camera worldCamera;
@@ -212,18 +214,34 @@ public class Motion : MonoBehaviour
         else
             GetComponent<Rigidbody>().drag = originalDrag;
 
+        Vector3 forceInput = new Vector3(
+            Input.GetAxis("Vertical"),
+            Input.GetAxis("Horizontal"),
+            Input.GetAxis("Forward"));
+
+        Vector3 torqueInput = new Vector3(
+            Input.GetAxis("Pitch"),
+            Input.GetAxis("Yaw"),
+            Input.GetAxis("Roll"));
+
+        force /= 60.0f;
+        rb.AddRelativeForce(forceInput * force * (1 + airDensity * 2));
+
+        float torqueMult = rotationForce * (1 + 5 * airDensity) * (1 + speedFactor) / 60.0f;
+
+        rb.AddRelativeTorque(torqueInput * torqueMult, ForceMode.Acceleration);
+
+        /*
         GetComponent<Rigidbody>().AddForce(Input.GetAxis("Vertical") * transform.up * Time.deltaTime * force * (1 + airDensity * 2));
         GetComponent<Rigidbody>().AddForce(Input.GetAxis("Horizontal") * transform.right * Time.deltaTime * force);
         GetComponent<Rigidbody>().AddForce(Input.GetAxis("Forward") * transform.forward * Time.deltaTime * force);
 
-
-
-        float torqueMult = rotationForce * (1 + 5 * airDensity) * (1 + speedFactor) * Time.deltaTime;
         //Debug.Log(torqueMult);
 
         GetComponent<Rigidbody>().AddTorque(Input.GetAxis("Roll") * transform.forward * torqueMult, ForceMode.Acceleration);
         GetComponent<Rigidbody>().AddTorque(Input.GetAxis("Yaw") * transform.up * torqueMult, ForceMode.Acceleration);
         GetComponent<Rigidbody>().AddTorque(Input.GetAxis("Pitch") * transform.right * torqueMult, ForceMode.Acceleration);
+        */
 
         float rcsTarget = 0;
         float mainEngineTarget = 0;
@@ -262,7 +280,7 @@ public class Motion : MonoBehaviour
 
     void UpdateShift()
     {
-        curRealPosition = realPosition + transform.position;
+        curRealPosition = originOffset + transform.position;
 
         if (transform.position.x > shiftRange ||
             transform.position.z > shiftRange ||
@@ -271,8 +289,36 @@ public class Motion : MonoBehaviour
         {
             ShiftOrigin();
         }
-    }
 
+        float sep = SectorUniverse.e.sectorSeparation;
+
+        Vector3 normalizedSectorPos = new Vector3(
+            (float)curRealPosition.x / sep,
+            (float)curRealPosition.y / sep,
+            (float)curRealPosition.z / sep);
+
+        normalizedSectorPos -= SectorUniverse.e.currentSector;
+
+        //Debug.Log(normalizedSectorPos);
+
+        const float extent = 0.5f;
+
+
+        if (normalizedSectorPos.x < -extent)
+            SectorUniverse.e.Move(-1, 0, 0, true);
+        else if (normalizedSectorPos.x > extent)
+            SectorUniverse.e.Move(1, 0, 0, true);
+
+        if (normalizedSectorPos.z < -extent)
+            SectorUniverse.e.Move(0, 0, -1, true);
+        else if (normalizedSectorPos.z > extent)
+            SectorUniverse.e.Move(0, 0, 1, true);
+
+        if (normalizedSectorPos.y < -extent)
+            SectorUniverse.e.Move(0, -1, 0, true);
+        else if (normalizedSectorPos.y > extent)
+            SectorUniverse.e.Move(0, 1, 0, true);
+    }
 
 #if TimedTrailRenderer
     public TimedTrailRenderer[] trails;

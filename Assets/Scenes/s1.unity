@@ -3130,6 +3130,7 @@ GameObject:
   - component: {fileID: 555659942}
   - component: {fileID: 555659943}
   - component: {fileID: 555659944}
+  - component: {fileID: 555659945}
   m_Layer: 0
   m_Name: Ship
   m_TagString: Untagged
@@ -3321,6 +3322,19 @@ MonoBehaviour:
   altitudeSlider: {fileID: 778319490}
   rectTestFloat: 0
   altitudeMaxValue: 100
+--- !u!114 &555659945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 555659939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd5b1d953d1782e44864b7f45aba221a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  force: {x: 0, y: 0, z: -2000}
 --- !u!1 &612121158
 GameObject:
   m_ObjectHideFlags: 0
@@ -10769,7 +10783,7 @@ MonoBehaviour:
   previewNames: 0
   orbitColor: {r: 0, g: 0.78057027, b: 1, a: 0.40392157}
   starPreviewRadius: 2000
-  planetPreviewRadius: 1000
+  planetPreviewRadius: 1
 --- !u!114 &1222550244
 MonoBehaviour:
   m_ObjectHideFlags: 0
