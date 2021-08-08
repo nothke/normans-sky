@@ -3172,15 +3172,11 @@ MonoBehaviour:
   rcsAudio: {fileID: 1452856438}
   mainEngineAudio: {fileID: 106592998}
   hyperAudio: {fileID: 1980629882}
-  rcsAudioVelo: 0
-  rcsAudioSmooth: 0
-  mainEngineVelo: 0
-  hyperVelo: 0
   trails:
   - {fileID: 42826939}
   - {fileID: 756035799}
   - {fileID: 1858355225}
-  debugGUI: 1
+  debugGUI: 0
   guiStyle:
     m_Name: alpa
     m_Normal:
@@ -3313,7 +3309,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 555659939}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69c48f4fea48f58409093709324b31de, type: 3}
   m_Name: 
@@ -3329,7 +3325,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 555659939}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd5b1d953d1782e44864b7f45aba221a, type: 3}
   m_Name: 

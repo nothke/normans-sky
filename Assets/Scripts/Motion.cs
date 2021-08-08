@@ -13,9 +13,8 @@ public class Motion : MonoBehaviour
     public static Motion e;
 
     public List<Transform> chunks = new List<Transform>();
-    public float shiftRange = 10;
+    public float shiftRange = 1000;
     public float translateForce = 100000;
-    private float forceMult;
     public float jumpForce = 1000;
     public float rotationForce = 10;
 
@@ -39,6 +38,26 @@ public class Motion : MonoBehaviour
 
     public float velocity;
     public float altitude;
+
+    public Camera worldCamera;
+
+    public float airDensity;
+    float aeroFactor;
+
+    public AudioSource rcsAudio;
+    public AudioSource mainEngineAudio;
+    public AudioSource hyperAudio;
+
+    // Audio
+    float rcsAudioVelo;
+    float mainEngineVelo;
+    float hyperVelo;
+
+    // Input
+    Vector3 forceInput;
+    Vector3 torqueInput;
+    bool hyperInput;
+    bool brakeInput;
 
     public static void AddChunk(Transform chunk)
     {
@@ -93,23 +112,23 @@ public class Motion : MonoBehaviour
         SectorUniverse.e.offset -= relativePosition;
     }
 
-    public Camera worldCamera;
+    private void Update()
+    {
+        forceInput = new Vector3(
+            Input.GetAxis("Horizontal"),
+            Input.GetAxis("Vertical"),
+            Input.GetAxis("Forward"));
 
-    public float airDensity;
-    float aeroFactor;
+        torqueInput = new Vector3(
+            Input.GetAxis("Pitch"),
+            Input.GetAxis("Yaw"),
+            Input.GetAxis("Roll"));
 
-    public AudioSource rcsAudio;
-    public AudioSource mainEngineAudio;
-    public AudioSource hyperAudio;
+        hyperInput = Input.GetKey(KeyCode.LeftControl);
+        brakeInput = Input.GetKey(KeyCode.Space);
+    }
 
-    public float rcsAudioVelo;
-    public float rcsAudioSmooth;
-
-    public float mainEngineVelo;
-    public float hyperVelo;
-
-
-    void Update()
+    void FixedUpdate()
     {
         velocity = rb.velocity.magnitude;
         Vector3 localVelocity = transform.InverseTransformDirection(rb.velocity);
@@ -168,7 +187,8 @@ public class Motion : MonoBehaviour
         float speedFactor = Mathf.Clamp(velocity / 10, 0, 1);
         //Debug.Log(speedFactor);
 
-        if (Input.GetKey(KeyCode.LeftControl))
+        float forceMult = 0;
+        if (hyperInput)
         {
             rb.angularDrag = 5;
 
@@ -176,7 +196,7 @@ public class Motion : MonoBehaviour
             {
                 forceMult = translateForce * 10;
 
-                if (Input.GetAxis("Forward") > 0)
+                if (forceInput.z > 0)
                     hyperTarget = 1;
             }
         }
@@ -188,20 +208,7 @@ public class Motion : MonoBehaviour
         }
 
         // Airbrake / spacebrake
-        if (Input.GetKey(KeyCode.Space))
-            rb.drag = 1;
-        else
-            rb.drag = originalDrag;
-
-        Vector3 forceInput = new Vector3(
-            Input.GetAxis("Horizontal"),
-            Input.GetAxis("Vertical"),
-            Input.GetAxis("Forward"));
-
-        Vector3 torqueInput = new Vector3(
-            Input.GetAxis("Pitch"),
-            Input.GetAxis("Yaw"),
-            Input.GetAxis("Roll"));
+        rb.drag = brakeInput ? 1 : originalDrag;
 
         Vector3 relForce = forceInput;
         relForce.y *= 1 + airDensity * 2;
@@ -227,7 +234,7 @@ public class Motion : MonoBehaviour
                 rcsTarget = 1;
         }
 
-        if (Input.GetAxis("Forward") != 0)
+        if (forceInput.z != 0)
             mainEngineTarget = 1;
 
         rcsAudio.volume = Mathf.SmoothDamp(rcsAudio.volume, rcsTarget, ref rcsAudioVelo, 0.1f);
@@ -319,6 +326,9 @@ public class Motion : MonoBehaviour
 
     void OnGUI()
     {
+        if (!debugGUI)
+            return;
+
         float h = guiH;
 
         GUILayout.BeginArea(new Rect(5, 5, 1000, 1000), guiStyle);
@@ -357,19 +367,5 @@ public class Motion : MonoBehaviour
         GUILayout.EndArea();
     }
 
-    void Output()
-    {
-        /*
-        if (xText) xText.text = realPosition.x.ToString();
-        if (yText) yText.text = transform.position.y.ToString();
-        if (zText) zText.text = realPosition.y.ToString();
-
-        if (sxText) sxText.text = transform.position.x.ToString();
-        if (syText) syText.text = transform.position.y.ToString();
-        if (szText) szText.text = transform.position.z.ToString();
-
-        if (speedText) speedText.text = velocity.ToString();
-        */
-    }
     #endregion
 }
