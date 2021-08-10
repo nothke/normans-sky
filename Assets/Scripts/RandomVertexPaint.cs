@@ -3,15 +3,16 @@ using System.Collections;
 
 public class RandomVertexPaint : MonoBehaviour
 {
-
-    // Use this for initialization
-
     public Color rC1;
     public Color rC2;
 
     void Start()
     {
+        Paint();
+    }
 
+    public void Paint()
+    {
         //float hue = Random.value;
         //float cHue = hue + 0.5f;
         //if (cHue > 1) cHue -= 1;
@@ -39,8 +40,6 @@ public class RandomVertexPaint : MonoBehaviour
 
         //mesh.vertices = vertices;
         mesh.colors = colors;
-
-        mf.mesh = mesh;
     }
 
 }

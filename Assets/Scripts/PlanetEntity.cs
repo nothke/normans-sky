@@ -19,6 +19,8 @@ public class PlanetEntity : CelestialBody
     public bool thunder;
     public bool snow;
 
+    public RandomVertexPaint painter;
+
     void OnDrawGizmos()
     {
         if (atmosphere)

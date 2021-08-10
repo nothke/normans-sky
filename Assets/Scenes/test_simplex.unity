@@ -75,11 +75,11 @@ LightmapSettings:
     m_BakeBackend: 0
     m_PVRSampling: 1
     m_PVRDirectSampleCount: 32
-    m_PVRSampleCount: 500
+    m_PVRSampleCount: 512
     m_PVRBounces: 2
-    m_PVREnvironmentSampleCount: 500
+    m_PVREnvironmentSampleCount: 512
     m_PVREnvironmentReferencePointCount: 2048
-    m_PVRFilteringMode: 2
+    m_PVRFilteringMode: 0
     m_PVRDenoiserTypeDirect: 0
     m_PVRDenoiserTypeIndirect: 0
     m_PVRDenoiserTypeAO: 0
@@ -132,12 +132,12 @@ GameObject:
   - component: {fileID: 107185115}
   - component: {fileID: 107185114}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: simplex_test
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &107185114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,9 +150,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0d2b7a720847924dae1a22cfa7abef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offsetX: 1128
-  offsetY: 861
-  offsetZ: 607
+  offsetX: 1188
+  offsetY: 882
+  offsetZ: 630
   cubeSize: 10
   pointSep: 1
   rayScale: 0.66
@@ -186,7 +186,7 @@ GameObject:
   - component: {fileID: 267335162}
   - component: {fileID: 267335161}
   m_Layer: 0
-  m_Name: GameObject (1)
+  m_Name: UNIVERSE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -204,39 +204,86 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf0bc4230a10ac468cfeae0ca3f1246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  curSectorX: -481
-  curSectorY: 81
-  curSectorZ: -224
-  sectorSeparation: 200
-  preview: 1
-  previewSectors: 1
-  previewSystems: 1
-  previewPlanets: 1
-  drawOrbits: 1
-  previewNames: 0
-  orbitColor: {r: 0, g: 0.751724, b: 1, a: 0.434}
-  sectorRadius: 3
-  systemProbability: 0.5
-  starPreviewRadius: 4
-  planetPreviewRadius: 1.45
-  skipZero: 1
-  octaves: 7
+  currentSector: {x: 19, y: 0, z: 0}
+  sectorRadius: 2
+  sectorSeparation: 50000
+  octaves: 3
   multiplier: 25
   amplitude: 1
   lacunarity: 2
   persistence: 0.9
-  maxPlanets: 10
-  minPlanetRange: 4.85
-  minPlanetSeparation: 5
-  nextPlanetPower: 1
-  maxPlanetRangeMult: 10
-  minPlanetRadius: 1
-  maxPlanetRadius: 2
+  systemProbability: 0.5
+  maxPlanets: 5
+  minPlanetRange: 5207
+  minPlanetSeparation: 1375.3
+  nextPlanetPower: 1.5
+  maxPlanetRangeMult: 1000
+  minPlanetRadius: 500
+  maxPlanetRadius: 2000
   gasGiantThreshold: 1500
-  generate: 0
+  skipZero: 1
+  starColorGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 0, b: 0, a: 1}
+    key1: {r: 1, g: 0.5176471, b: 0, a: 1}
+    key2: {r: 1, g: 0.972549, b: 0, a: 1}
+    key3: {r: 1, g: 1, b: 1, a: 0}
+    key4: {r: 0.9254902, g: 0.9529412, b: 1, a: 0}
+    key5: {r: 0, g: 0.38039216, b: 1, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 8481
+    ctime2: 15998
+    ctime3: 27178
+    ctime4: 42020
+    ctime5: 65535
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 65535
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 6
+    m_NumAlphaKeys: 2
+  planetColorGradient:
+    serializedVersion: 2
+    key0: {r: 0, g: 0, b: 0, a: 1}
+    key1: {r: 1, g: 0, b: 0, a: 1}
+    key2: {r: 1, g: 0.9490196, b: 0.654902, a: 0}
+    key3: {r: 0.67058825, g: 0.67058825, b: 0.67058825, a: 0}
+    key4: {r: 0.42745098, g: 0.38039216, b: 0.3019608, a: 0}
+    key5: {r: 0.99607843, g: 1, b: 0.6039216, a: 0}
+    key6: {r: 0, g: 0.41960785, b: 1, a: 0}
+    key7: {r: 0.13333334, g: 0.5529412, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 4626
+    ctime2: 10409
+    ctime3: 22937
+    ctime4: 40670
+    ctime5: 55127
+    ctime6: 61102
+    ctime7: 65535
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 8
+    m_NumAlphaKeys: 2
+  generate: 1
   generateRings: 0
-  starPrefab: {fileID: 0}
-  planetPrefab: {fileID: 0}
+  starPrefab: {fileID: 128662, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
+  planetPrefab: {fileID: 197542, guid: 82c5d72f47757414dbd26d3023f08577, type: 3}
   updateNames: 0
   namePrefixes:
   - Altar
@@ -407,7 +454,7 @@ MonoBehaviour:
   - Zolt
   nameSuffixes:
   - arria
-  - Illia
+  - illia
   - ies
   - ealis
   - ion
@@ -448,65 +495,16 @@ MonoBehaviour:
   - el
   - ond
   - illon
-  initOnStart: 0
-  starColorGradient:
-    serializedVersion: 2
-    key0: {r: 1, g: 0, b: 0, a: 1}
-    key1: {r: 1, g: 0.5176471, b: 0, a: 1}
-    key2: {r: 1, g: 0.972549, b: 0, a: 1}
-    key3: {r: 1, g: 1, b: 1, a: 0}
-    key4: {r: 0.9254902, g: 0.9529412, b: 1, a: 0}
-    key5: {r: 0, g: 0.38039216, b: 1, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 8481
-    ctime2: 15998
-    ctime3: 27178
-    ctime4: 42020
-    ctime5: 65535
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 65535
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 6
-    m_NumAlphaKeys: 2
-  planetColorGradient:
-    serializedVersion: 2
-    key0: {r: 0, g: 0, b: 0, a: 1}
-    key1: {r: 1, g: 0, b: 0, a: 1}
-    key2: {r: 1, g: 0.9490196, b: 0.654902, a: 0}
-    key3: {r: 0.67058825, g: 0.67058825, b: 0.67058825, a: 0}
-    key4: {r: 0.42745098, g: 0.38039216, b: 0.3019608, a: 0}
-    key5: {r: 0.99607843, g: 1, b: 0.6039216, a: 0}
-    key6: {r: 0, g: 0.41960785, b: 1, a: 0}
-    key7: {r: 0.13333334, g: 0.5529412, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 4626
-    ctime2: 10409
-    ctime3: 22937
-    ctime4: 40670
-    ctime5: 55127
-    ctime6: 61102
-    ctime7: 65535
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 8
-    m_NumAlphaKeys: 2
+  initOnStart: 1
+  preview: 1
+  previewSectors: 1
+  previewSystems: 1
+  previewPlanets: 1
+  drawOrbits: 1
+  previewNames: 0
+  orbitColor: {r: 0, g: 0.78057027, b: 1, a: 0.40392157}
+  starPreviewRadius: 2000
+  planetPreviewRadius: 1
 --- !u!4 &267335162
 Transform:
   m_ObjectHideFlags: 0
@@ -662,63 +660,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &758468379
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 758468381}
-  - component: {fileID: 758468380}
-  m_Layer: 0
-  m_Name: GameObject (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &758468380
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 758468379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e81e8b4d6eeb29147a7d8ae0bbd42bd4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  update: 0
-  material: {fileID: 2100000, guid: c5164e7467fd6dc4f9f1882086708de9, type: 2}
-  lerpableColors:
-  - {r: 1, g: 1, b: 1, a: 1}
-  - {r: 0.85294116, g: 0.8347751, b: 0.7588668, a: 1}
-  - {r: 0.5441177, g: 0.5441177, b: 0.5441177, a: 1}
-  - {r: 0.5294118, g: 0.45198667, b: 0.3931661, a: 1}
-  - {r: 1, g: 1, b: 1, a: 0}
-  minRings: 3
-  maxRings: 50
-  crossSegments: 64
-  firstRadius: 1
-  minRadius: 0.001
-  maxRadius: 1
---- !u!4 &758468381
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 758468379}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1204840757
 GameObject:
   m_ObjectHideFlags: 0
@@ -811,71 +752,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1879496635
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1879496636}
-  - component: {fileID: 1879496637}
-  m_Layer: 0
-  m_Name: Tube
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1879496636
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1879496635}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1879496637
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1879496635}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1f6bfc7ec81fb84788d8b9d17716586, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  update: 1
-  doMeshCollider: 0
-  internalMaterial: {fileID: 2100000, guid: c5164e7467fd6dc4f9f1882086708de9, type: 2}
-  crossSegments: 32
-  thickness: 0.1
-  capEnds: 0
-  doInterior: 1
-  stdUvScale: {x: 0.5, y: 3}
-  segments:
-  - radius: 1.01
-    height: 0.001
-    material: {fileID: 2100000, guid: c5164e7467fd6dc4f9f1882086708de9, type: 2}
-    verticalSubtiles: 0
-    horizontalSubtiles: 0
-    uvScale: {x: 0, y: 0}
-    vertexColor: {r: 1, g: 1, b: 1, a: 1}
-  - radius: 2.36
-    height: 0.002
-    material: {fileID: 2100000, guid: c5164e7467fd6dc4f9f1882086708de9, type: 2}
-    verticalSubtiles: 0
-    horizontalSubtiles: 0
-    uvScale: {x: 0, y: 0}
-    vertexColor: {r: 1, g: 0, b: 0, a: 1}
-  totalHeight: 0.001
-  doConvexTriggers: 0

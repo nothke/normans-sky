@@ -19,11 +19,6 @@ namespace UnityStandardAssets.ImageEffects
 
         private RenderTexture accumTexture;
 
-        override protected void Start()
-        {
-            base.Start();
-        }
-
         override protected void OnDisable()
         {
             base.OnDisable();

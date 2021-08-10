@@ -1,37 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using VectorExtensions;
+
+using Nothke.Collections;
+using SkyUtils;
 
 public class SectorUniverse : MonoBehaviour
 {
     public static SectorUniverse e;
 
-    public int curSectorX;
-    public int curSectorY;
-    public int curSectorZ;
+    #region Inspector vars
 
-    public float sectorSeparation = 10;
-
-    public bool preview = true;
-    public bool previewSectors = true;
-    public bool previewSystems = true;
-    public bool previewPlanets = true;
-    public bool drawOrbits = false;
-    public bool previewNames = false;
-    public Color orbitColor = Color.white;
+    public Vector3Int currentSector;
 
     [Range(1, 10)]
     public int sectorRadius = 3;
-
-    int sectorRange = 10;
-
-    public float systemProbability = 0.5f;
-
-    public float starPreviewRadius = 1;
-    public float planetPreviewRadius = 0.5f;
-
-    public bool skipZero = true;
+    public float sectorSeparation = 10;
 
     [Header("Simplex properties")]
     public int octaves = 3;
@@ -41,6 +25,7 @@ public class SectorUniverse : MonoBehaviour
     public float persistence = 0.9f;
 
     [Header("System properties")]
+    public float systemProbability = 0.5f;
     public int maxPlanets = 10;
     public float minPlanetRange = 5;
     public float minPlanetSeparation = 5;
@@ -52,20 +37,86 @@ public class SectorUniverse : MonoBehaviour
 
     public float gasGiantThreshold = 1500;
 
+    public bool skipZero = true;
+
+    public Gradient starColorGradient;
+    public Gradient planetColorGradient;
+
     [Header("Generator Prefabs")]
     public bool generate = false;
     public bool generateRings;
     public GameObject starPrefab;
     public GameObject planetPrefab;
 
-
-    SimplexNoiseGenerator simplex;
-
     public bool updateNames;
     public string[] namePrefixes;
     public string[] nameSuffixes;
 
     public bool initOnStart;
+
+    [Header("Preview")]
+
+    public bool preview = true;
+    public bool previewSectors = true;
+    public bool previewSystems = true;
+    public bool previewPlanets = true;
+    public bool drawOrbits = false;
+    public bool previewNames = false;
+    public Color orbitColor = Color.white;
+
+    public float starPreviewRadius = 1;
+    public float planetPreviewRadius = 0.5f;
+
+    #endregion
+
+    #region Private vars
+
+    public class Sector
+    {
+        public Vector3Int coordinate;
+
+        public bool hasSystem;
+
+        public string name;
+
+        public Vector3 orbitNormal;
+
+        public float starSize; // incomplete
+        public Vector3 starPostion;
+        public Color starColor;
+
+        public struct Planet
+        {
+            public float orbitRadius;
+            public float radius;
+            public Vector3 position;
+            public Color color;
+            public Color secondaryColor;
+        }
+
+        public List<Planet> planets;
+
+        public StarEntity[] star;
+        public StarEntity[] newStar;
+        public bool flagDestroy;
+
+        public Sector(int maxPlanets)
+        {
+            planets = new List<Planet>(maxPlanets);
+        }
+    }
+
+    public Vector3d offset;
+
+    SimplexNoiseGenerator simplex;
+    int sectorRange = -1;
+
+    Sector[,,] sectors;
+
+    GameObjectPool starPool;
+    GameObjectPool planetPool;
+
+    #endregion
 
     void Awake()
     {
@@ -90,39 +141,11 @@ public class SectorUniverse : MonoBehaviour
         nameSuffixes = SReader.GetLines(path, "SUFFIXES");
     }
 
-    public Gradient starColorGradient;
-    public Gradient planetColorGradient;
-
-    public class Sector
+    void CreateGeneratorIfNeeded()
     {
-        public Vector3i coordinate;
-
-        public bool hasSystem;
-
-        public string name;
-
-        public Vector3 orbitNormal;
-
-        public float starSize; // incomplete
-        public Vector3 starPostion;
-        public Color starColor;
-
-        public float[] planetOrbits;
-        public float[] planetRadii;
-        public Vector3[] planetPositions;
-        public Color[] planetColors;
-
-        public StarEntity[] star;
-        public StarEntity[] newStar;
-        public bool flagDestroy;
+        if (simplex == null)
+            simplex = new SimplexNoiseGenerator("42");
     }
-
-    void CreateSimplex()
-    {
-        if (simplex == null) simplex = new SimplexNoiseGenerator("42");
-    }
-
-    Sector[,,] sectors;
 
     int GetSectorRange()
     {
@@ -135,84 +158,78 @@ public class SectorUniverse : MonoBehaviour
 
         sectors = new Sector[sectorRange, sectorRange, sectorRange];
 
+        Vector3Int radiusVector = new Vector3Int(sectorRadius, sectorRadius, sectorRadius);
+
         for (int x = 0; x < sectorRange; x++)
         {
             for (int y = 0; y < sectorRange; y++)
             {
                 for (int z = 0; z < sectorRange; z++)
                 {
-                    sectors[x, y, z] = CreateNewSector(curSectorX - sectorRadius + x, curSectorY - sectorRadius + y, curSectorZ - sectorRadius + z);
+
+                    sectors[x, y, z] = CreateNewSector(currentSector - radiusVector + new Vector3Int(x, y, z));
+                    //sectors[x, y, z] = CreateNewSector(curSectorX - sectorRadius + x, curSectorY - sectorRadius + y, curSectorZ - sectorRadius + z);
 
                 }
             }
         }
+
+        Debug.Log("Created sectors");
     }
 
-    void Move(int byX, int byY, int byZ)
+    public void Move(int byX, int byY, int byZ, bool doOffset = false)
     {
-        SmartMovePhysical(byX, byY, byZ);
-
-        /*
-        ClearAllSectors();
-        CreateAllSectors();
-
-        GeneratePhysical();
-        */
+        Move(new Vector3Int(byX, byY, byZ), doOffset);
     }
 
-    bool CoordinateIsInsideBounds(Vector3i coord)
+    public void Move(Vector3Int by, bool doOffset = false)
     {
-        Vector3i currentSector = GetCurSector();
+        if (doOffset)
+            offset += (Vector3)by * sectorSeparation;
 
-        if (coord >= currentSector - Vector3i.one * sectorRadius &&
-            coord <= currentSector + Vector3i.one * sectorRadius)
-            return true;
-
-        return false;
+        SmartMovePhysical(by, !doOffset);
     }
 
-    void SmartMovePhysical(int byX, int byY, int byZ)
+    bool CoordinateIsInsideBounds(Vector3Int coord)
     {
-        Vector3i by = new Vector3i(byX, byY, byZ);
+        BoundsInt bounds = new BoundsInt(
+            -sectorRadius, -sectorRadius, -sectorRadius,
+            sectorRange, sectorRange, sectorRange);
 
-        // PASS 1 - rearrange and flag
+        return bounds.Contains(coord - currentSector);
+    }
+
+    void SmartMovePhysical(Vector3Int by, bool shiftPersistingSystems = true)
+    {
+        // PASS 1 - Move stars and release out of bounds stars
         foreach (var sector in sectors)
         {
             if (CoordinateIsInsideBounds(sector.coordinate - by))
             {
-                // if next sector is inside bounds, transfer this system into the next sector..
+                // Transfer this star into the next sector..
                 Sector nextSector = GetSectorFromWorldCoord(sector.coordinate - by);
                 nextSector.newStar = sector.star;
 
                 // ..and move it if it has any star
-                ShiftSystem(nextSector.newStar, -by);
+                if (shiftPersistingSystems)
+                    ShiftSystem(nextSector.newStar, -by);
             }
             else
             {
-                // else flag system for destruction
-                sector.flagDestroy = true;
+                // if the sector is out of bounds release the star back into the pool
+                ReleaseStarSystem(sector.star);
             }
         }
 
         // change current sector
-        curSectorX += byX;
-        curSectorY += byY;
-        curSectorZ += byZ;
+        currentSector += by;
 
-        // PASS 2 - destroy and construct
+        // PASS 2 - Construct new sectors
         foreach (var sector in sectors)
         {
-            if (sector.flagDestroy)
-            {
-                DestroySystem(sector.star);
-
-                sector.flagDestroy = false;
-            }
-
             sector.star = null;
 
-            // now set new coordinates
-            sector.coordinate = sector.coordinate + by;
+            sector.coordinate += by;
 
             // overwrite star with ones that are transfered
             if (sector.newStar != null)
@@ -221,15 +238,16 @@ public class SectorUniverse : MonoBehaviour
             sector.newStar = null;
 
             // and recreate sector data
-            CreateSector(sector);
+            RegenerateSector(sector);
 
-            // if sector has no physical star, create new one
-            if (sector.star == null)
+            // if sector should have a physical star,
+            // and doesn't have one (meaning it's a new in-bounds sector), create the star
+            if (sector.hasSystem && sector.star == null)
                 GeneratePhysical(sector);
         }
     }
 
-    void ShiftSystem(StarEntity[] stars, Vector3i by)
+    void ShiftSystem(StarEntity[] stars, Vector3Int by)
     {
         if (stars == null) return;
 
@@ -244,40 +262,20 @@ public class SectorUniverse : MonoBehaviour
         }
     }
 
-    Sector GetSectorFromWorldCoord(Vector3i coord)
+    Sector GetSectorFromWorldCoord(Vector3Int coord)
     {
-        Vector3i localCoord = coord + Vector3i.one * sectorRadius - GetCurSector();
+        Vector3Int localCoord = coord + Vector3Int.one * sectorRadius - currentSector;
 
         return sectors[localCoord.x, localCoord.y, localCoord.z];
     }
 
     void ClearAllPhysical()
     {
-        float tTest = Time.realtimeSinceStartup; // TEST TIMER
-
         foreach (var sector in sectors)
         {
-            if (!sector.hasSystem) continue;
-
-            if (sector.star == null) continue;
-
-            if (sector.star.Length == 0) continue;
-
-            for (int i = 0; i < sector.star.Length; i++)
-            {
-                if (sector.star[i].planets.Length > 0) continue;
-
-                for (int j = 0; j < sector.star[i].planets.Length; j++)
-                {
-                    Destroy(sector.star[i].planets[j].gameObject);
-                }
-
-                Destroy(sector.star[i].gameObject);
-            }
+            if (sector.star != null && sector.star.Length > 0)
+                ReleaseStarSystem(sector.star);
         }
-
-        Debug.Log("Clear all physical: " + (Time.realtimeSinceStartup - tTest)); // TEST TIMER
-
     }
 
     IEnumerator FrameAfter()
@@ -293,9 +291,18 @@ public class SectorUniverse : MonoBehaviour
 
     public void GeneratePhysical()
     {
-        if (!generate) return;
+        if (!generate)
+            return;
 
-        if (!starPrefab || !planetPrefab) return;
+        if (!starPrefab || !planetPrefab)
+        {
+            Debug.LogError("Star or Planet prefabs are missing");
+            return;
+        }
+
+        int sectorCount = sectorRange * sectorRange * sectorRange;
+        starPool = new GameObjectPool(starPrefab, sectorCount);
+        planetPool = new GameObjectPool(planetPrefab, sectorCount * maxPlanets);
 
         ClearAllPhysical();
 
@@ -313,43 +320,71 @@ public class SectorUniverse : MonoBehaviour
 
     void GeneratePhysical(Sector sector)
     {
-        if (sector.hasSystem)
+        if (!sector.hasSystem)
         {
-            Vector3 sectorStartPos = GetSectorStartPos(sector);
-
-            GameObject starGO = Instantiate(starPrefab, sectorStartPos + sector.starPostion, Quaternion.identity) as GameObject;
-            if (Motion.e) Motion.e.chunks.Add(starGO.transform);
-            // material color?
-
-            // if not a nebula generate only one star
-            sector.star = new StarEntity[1];
-            sector.star[0] = starGO.GetComponent<StarEntity>();
-
-            if (sector.planetPositions.Length > 0)
+            if (sector.star != null)
             {
-                sector.star[0].planets = new PlanetEntity[sector.planetPositions.Length];
+                Debug.LogWarning("Sector should have released the stars long ago! No matter, releasing now");
+                ReleaseStarSystem(sector.star);
+            }
 
-                for (int i = 0; i < sector.planetPositions.Length; i++)
+            return;
+        }
+
+        Vector3 sectorStartPos = GetSectorStartPos(sector);
+
+        GameObject starGO = starPool.GetGO();
+        starGO.transform.position = sectorStartPos + sector.starPostion;
+        Motion.AddChunk(starGO.transform);
+
+        // TODO: material color
+
+        // if not a nebula generate only one star
+        if (sector.star == null)
+            sector.star = new StarEntity[1];
+
+        sector.star[0] = starGO.GetComponent<StarEntity>();
+
+        StarEntity star = sector.star[0];
+
+        if (sector.planets.Count > 0)
+        {
+            if (star.planets == null)
+                star.planets = new List<PlanetEntity>(maxPlanets);
+
+            star.planets.Clear();
+
+            star.renderer.material.color = sector.starColor * 2;
+
+            for (int i = 0; i < sector.planets.Count; i++)
+            {
+                GameObject planetGO = planetPool.GetGO();
+                planetGO.transform.position = sectorStartPos + sector.planets[i].position;
+                Motion.AddChunk(planetGO.transform);
+
+                PlanetEntity planet = planetGO.GetComponent<PlanetEntity>();
+
+                Debug.Assert(planet, "PlanetEntity not found on planetPrefab");
+
+                planet.radius = sector.planets[i].radius;
+                planet.UpdateRadii();
+
+                if (planet.radius < gasGiantThreshold)
                 {
-                    GameObject planetGO = Instantiate(planetPrefab, sectorStartPos + sector.planetPositions[i], Quaternion.identity) as GameObject;
-                    if (Motion.e) Motion.e.chunks.Add(planetGO.transform);
+                    planet.type = PlanetEntity.Type.GasGiant;
 
-                    PlanetEntity planet = planetGO.GetComponent<PlanetEntity>();
-
-                    planet.radius = sector.planetRadii[i];
-
-                    if (planet.radius < gasGiantThreshold)
-                    {
-                        planet.type = PlanetEntity.Type.GasGiant;
-
-                        if (generateRings)
-                            if (Random.value < 0.5f)
-                                planet.GetComponent<RingMaker>().enabled = true;
-                    }
-
-                    sector.star[0].planets[i] = planet;
-                    if (!sector.star[0].planets[i]) Debug.LogWarning("PlanetEntity not found");
+                    if (generateRings)
+                        if (Random.value < 0.5f)
+                            planet.GetComponent<RingMaker>().enabled = true;
                 }
+
+                planet.painter.rC1 = sector.planets[i].color;
+                planet.painter.rC2 = sector.planets[i].secondaryColor;
+                planet.painter.Paint();
+
+                Debug.Assert(star.planets != null, "Planets are null");
+
+                star.planets.Add(planet);
             }
         }
     }
@@ -375,20 +410,19 @@ public class SectorUniverse : MonoBehaviour
         }
     }
 
-    Sector CreateNewSector(int x, int y, int z)
+    Sector CreateNewSector(Vector3Int coord)
     {
-        CreateSimplex();
+        CreateGeneratorIfNeeded();
 
-        Sector s = new Sector();
+        Sector s = new Sector(maxPlanets);
+        s.coordinate = coord;
 
-        s.coordinate = new Vector3i(x, y, z);
-
-        CreateSector(s);
+        RegenerateSector(s);
 
         return s;
     }
 
-    void CreateSector(Sector s)
+    void RegenerateSector(Sector s)
     {
         int x = s.coordinate.x;
         int y = s.coordinate.y;
@@ -401,14 +435,17 @@ public class SectorUniverse : MonoBehaviour
 
         Random.InitState(("ad" + x + "_" + y + "_" + z).GetHashCode());
 
+        s.planets.Clear();
+
+        if (skipZero && s.coordinate == Vector3Int.zero)
+            return;
+
         if (value < systemProbability) // has no solar system
+        {
+            s.hasSystem = false;
             return;
-
-        // has a solar system:
-        if (skipZero && s.coordinate == Vector3i.zero)
-            return;
-
-        s.hasSystem = true;
+        }
+        else s.hasSystem = true;
 
         s.name = SReader.GetRandom(namePrefixes) + SReader.GetRandom(nameSuffixes);
         s.starPostion = new Vector3(Random.value, Random.value, Random.value) * sectorSeparation;
@@ -416,56 +453,57 @@ public class SectorUniverse : MonoBehaviour
         s.starSize = (value - 0.5f) * 2;
 
         s.starColor = starColorGradient.Evaluate(s.starSize);
+        {
+            Color.RGBToHSV(s.starColor, out float h, out float _s, out float v);
+            s.starColor = Color.HSVToRGB(h + Random.value * 0.05f, _s * 0.7f, v);
+        }
 
         s.orbitNormal = Random.insideUnitSphere.normalized;
 
         int planetsNum = Random.Range(0, maxPlanets);
-        s.planetOrbits = new float[planetsNum];
-        s.planetPositions = new Vector3[planetsNum];
-        s.planetColors = new Color[planetsNum];
-        s.planetRadii = new float[planetsNum];
 
         float orbitRadius = minPlanetRange;
 
         for (int i = 0; i < planetsNum; i++)
         {
             orbitRadius += Random.Range(minPlanetSeparation, minPlanetSeparation * (Mathf.Pow(i + 1, nextPlanetPower)));
-            s.planetOrbits[i] = orbitRadius;
 
             Vector3 pos = RandomPointOnPlane(s.orbitNormal, orbitRadius);
 
-            s.planetPositions[i] = s.starPostion + pos;
-            s.planetRadii[i] = Random.Range(minPlanetRadius, maxPlanetRadius);
-            s.planetColors[i] = planetColorGradient.Evaluate(Random.value);
+            s.planets.Add(new Sector.Planet()
+            {
+                orbitRadius = orbitRadius,
+                position = s.starPostion + pos,
+                radius = Random.Range(minPlanetRadius, maxPlanetRadius), // TODO: Should be relative to type? Gas giants should be bigger
+                color = planetColorGradient.Evaluate(Random.value),
+                secondaryColor = Random.ColorHSV()
+            });
         }
 
         Random.state = randState;
     }
 
-    void DestroySystem(StarEntity[] stars)
+    void ReleaseStarSystem(StarEntity[] stars)
     {
-        if (stars == null) return;
-
-        if (stars.Length == 0) return;
+        if (stars == null || stars.Length == 0)
+            return;
 
         for (int i = 0; i < stars.Length; i++)
         {
-            if (stars[i].planets.Length > 0)
-                for (int j = 0; j < stars[i].planets.Length; j++)
-                {
-                    //if (stars[i].planets[i]) // shouldn't happen
-                    Destroy(stars[i].planets[j].gameObject);
-                }
+            var star = stars[i];
 
-            Destroy(stars[i].gameObject);
+            foreach (var planet in star.planets)
+            {
+                Motion.RemoveChunk(planet.transform);
+                planetPool.Release(planet.gameObject);
+            }
+
+            Motion.RemoveChunk(star.transform);
+            starPool.Release(star.gameObject);
+
+            stars[i] = null;
         }
     }
-
-    Vector3i GetCurSector()
-    {
-        return new Vector3i(curSectorX, curSectorY, curSectorZ);
-    }
-
 
     private Vector3 RandomPointOnPlane(Vector3 normal, float radius)
     {
@@ -489,10 +527,10 @@ public class SectorUniverse : MonoBehaviour
 
     Vector3 GetSectorMidPos(int x, int y, int z)
     {
-        Vector3 relativeSector = new Vector3(x - curSectorX, y - curSectorY, z - curSectorZ);
+        Vector3 relativeSector = new Vector3(x - currentSector.x, y - currentSector.y, z - currentSector.z);
         //relativeSector -= Vector3.one * (0.5f * sectorRange - 0.5f); // OLD calc
 
-        return relativeSector * sectorSeparation;
+        return relativeSector * sectorSeparation + (Vector3)offset;
     }
 
     Vector3 GetSectorStartPos(Sector s)
@@ -505,29 +543,21 @@ public class SectorUniverse : MonoBehaviour
         return GetSectorMidPos(x, y, z) - (Vector3.one * sectorSeparation / 2);
     }
 
-    int prevCurX, prevCurY, prevCurZ;
-
     void OnValidate()
     {
-        CreateAllSectors();
-
-        if (updateNames == true)
-        {
-            UpdateNames();
-            updateNames = false;
-        }
-
-        /*
-        if (curSectorX != prevCurX || curSectorY != prevCurY || curSectorZ != prevCurZ)
+        if (!Application.isPlaying)
         {
             CreateAllSectors();
 
-            prevCurX = curSectorX;
-            prevCurY = curSectorY;
-            prevCurZ = curSectorZ;
-        }*/
+            if (updateNames == true)
+            {
+                UpdateNames();
+                updateNames = false;
+            }
+        }
     }
 
+#if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if (!preview)
@@ -536,9 +566,9 @@ public class SectorUniverse : MonoBehaviour
         if (sectors == null)
             return;
 
-#if UNITY_EDITOR
+        sectorRange = GetSectorRange();
+
         UnityEditor.Handles.color = orbitColor;
-#endif
 
         foreach (var sector in sectors)
         {
@@ -548,7 +578,7 @@ public class SectorUniverse : MonoBehaviour
             {
                 if (previewSectors)
                 {
-                    Gizmos.color = new Color(1,1,1,0.1f);
+                    Gizmos.color = new Color(1, 1, 1, 0.1f);
                     Gizmos.DrawWireCube(GetSectorMidPos(sector), Vector3.one * sectorSeparation);
                 }
 
@@ -560,24 +590,26 @@ public class SectorUniverse : MonoBehaviour
 
                     Gizmos.DrawSphere(sectorStartPos + sector.starPostion, starPreviewRadius);
 
-#if UNITY_EDITOR
                     if (previewNames)
                         UnityEditor.Handles.Label(sectorStartPos + sector.starPostion, sector.name);
-#endif
 
-                    if (previewPlanets && sector.planetPositions.Length > 0)
+                    if (previewPlanets && sector.planets.Count > 0)
                     {
-                        for (int i = 0; i < sector.planetPositions.Length; i++)
+                        for (int i = 0; i < sector.planets.Count; i++)
                         {
-                            Gizmos.color = sector.planetColors[i];
-                            Gizmos.DrawSphere(sectorStartPos + sector.planetPositions[i], sector.planetRadii[i]); // planetPreviewRadius
+                            var p = sector.planets[i];
 
-#if UNITY_EDITOR
+                            Gizmos.color = p.color;
+                            Gizmos.DrawSphere(sectorStartPos + p.position,
+                                p.radius * planetPreviewRadius);
+
                             if (drawOrbits)
                             {
-                                UnityEditor.Handles.DrawWireDisc(sectorStartPos + sector.starPostion, sector.orbitNormal, sector.planetOrbits[i]);
+                                UnityEditor.Handles.DrawWireDisc(
+                                    sectorStartPos + sector.starPostion,
+                                    sector.orbitNormal,
+                                    p.orbitRadius);
                             }
-#endif
                         }
                     }
                 }
@@ -585,18 +617,15 @@ public class SectorUniverse : MonoBehaviour
         }
 
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(Vector3.zero, Vector3.one * sectorSeparation);
+        Gizmos.DrawWireCube((Vector3)offset, Vector3.one * sectorSeparation);
     }
-
-    void Update()
-    {
-#if UNITY_EDITOR
-
-
-        if (Input.GetKeyDown(KeyCode.U))
-            Move(0, 1, 0);
-
 #endif
 
+#if UNITY_EDITOR
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.U))
+            Move(0, 1, 0, true);
     }
+#endif
 }

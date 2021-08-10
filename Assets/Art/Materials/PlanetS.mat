@@ -56,12 +56,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Alpha: 0.6
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FadeDistance: 0.003
     - _Falloff: 3.04
     - _FalloffPlanet: 4.11
     - _Glossiness: 0.5
@@ -69,7 +67,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _RimPower: 0.5
+    - _RimPower: 3.14
     - _Shininess: 0.7
     - _Size: 1.35
     - _SrcBlend: 1
@@ -82,6 +80,6 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Emission: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _InnerColor: {r: 0.10461722, g: 0.19044194, b: 0.33088237, a: 1}
+    - _InnerColor: {r: 0.054065738, g: 0.10328421, b: 0.18382353, a: 1}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 1}

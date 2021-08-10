@@ -45,6 +45,7 @@ public class CelestialGravity : MonoBehaviour
 
     }
 
+    // Update is called once per frame
     public static float GetForceMagnitude(float bodyEarthMasses, float rbMassKilos, float squareDistance)
     {
         return (gravityMult * bodyEarthMasses * rbMassKilos) / (squareDistance);
@@ -80,31 +81,23 @@ public class CelestialGravity : MonoBehaviour
             // check if ship is within range of this planet
             Vector3 motionDir = transform.position - Motion.e.transform.position;
 
-            if ((motionDir).sqrMagnitude < RangeSqr)
-            {
-                if (!wasIn)
-                    Motion.e.AddBody(GetComponent<CelestialBody>());
+        Vector3 motionDiff = transform.position - Motion.e.transform.position;
+        if ((motionDiff).sqrMagnitude < gravityRange * gravityRange)
+            Motion.e.currentPlanet = GetComponent<PlanetEntity>();
 
-                wasIn = true;
-            }
-            else
-            {
-                if (wasIn)
-                    Motion.e.RemoveBody(GetComponent<CelestialBody>());
-
-                wasIn = false;
-            }
-
-
-            // make it the current planet
-            //Motion.e.currentPlanet = GetComponent<PlanetEntity>();
-        }
-
-        if (Game.e)
+        if (BodyManager.e)
         {
-            foreach (Rigidbody rb in Game.e.rigidbodies)
+            foreach (Rigidbody rb in BodyManager.e.rigidbodies)
             {
-                ApplyGravityForce(rb);
+                Vector3 direction = transform.position - rb.position;
+                float rSqr = (direction).sqrMagnitude;
+
+                force = (gravitationalConstant * rb.mass * planetMass) / rSqr;
+
+                if (rSqr < gravityRange * gravityRange)
+                {
+                    rb.AddForce(force * direction.normalized * Time.deltaTime);
+                }
             }
         }
     }
