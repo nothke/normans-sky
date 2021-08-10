@@ -344,11 +344,15 @@ public class SectorUniverse : MonoBehaviour
             sector.star = new StarEntity[1];
 
         sector.star[0] = starGO.GetComponent<StarEntity>();
+        Debug.Assert(sector.star[0] != null, "StarEntity component not on star");
 
         StarEntity star = sector.star[0];
 
+
         if (sector.planets.Count > 0)
         {
+            Debug.Assert(star.planets != null, "Planets are null");
+
             if (star.planets == null)
                 star.planets = new List<PlanetEntity>(maxPlanets);
 

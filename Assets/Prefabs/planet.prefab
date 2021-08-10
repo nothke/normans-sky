@@ -284,9 +284,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyMass: 100000
+  gravitationalConstant: 0.000006
+  gravityRange: 2000
   drawGizmos: 1
   force: 0
-  gravAt: 0
+  gravAt: 2449.4897
 --- !u!114 &11441224
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,11 +311,12 @@ MonoBehaviour:
   atmosphere: 1
   atmosphereColor: {r: 0.5293036, g: 0.6700275, b: 0.8088235, a: 1}
   atmosphereHeight: 60
-  atmoSphereSphere: {fileID: 109938}
+  atmoSphereSphere: {fileID: 486350}
   type: 0
   rain: 0
   thunder: 0
   snow: 0
+  painter: {fileID: 11482226}
 --- !u!114 &11462492
 MonoBehaviour:
   m_ObjectHideFlags: 0

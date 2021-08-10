@@ -226,6 +226,7 @@ MonoBehaviour:
   mass: 3.3510238e+10
   body: {fileID: 454964}
   gravity: {fileID: 0}
+  renderer: {fileID: 2349664}
   planets: []
 --- !u!114 &11418786
 MonoBehaviour:
@@ -240,6 +241,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyMass: 1000000
+  gravitationalConstant: 0.000006
+  gravityRange: 2000
   drawGizmos: 1
   force: 0
   gravAt: 7745.967

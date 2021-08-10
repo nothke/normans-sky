@@ -6,10 +6,10 @@ public class CelestialGravity : MonoBehaviour
 {
 
     public float bodyMass = 100000;
-    //public float bodyEarthMasses = 1;
-    //public float gravitationalConstant = 0.000006f;
 
-    //static float gravityRange = 2000;
+    //public float bodyEarthMasses = 1;
+    public float gravitationalConstant = 0.000006f;
+    public float gravityRange = 2000;
 
     public bool drawGizmos;
 
@@ -76,14 +76,18 @@ public class CelestialGravity : MonoBehaviour
 
     void Update()
     {
-        if (Motion.e)
+        if (!Motion.e)
         {
-            // check if ship is within range of this planet
-            Vector3 motionDir = transform.position - Motion.e.transform.position;
+            enabled = false;
+            return;
+        }
+
+        // check if ship is within range of this planet
+        Vector3 motionDir = transform.position - Motion.e.transform.position;
 
         Vector3 motionDiff = transform.position - Motion.e.transform.position;
         if ((motionDiff).sqrMagnitude < gravityRange * gravityRange)
-            Motion.e.currentPlanet = GetComponent<PlanetEntity>();
+            Motion.e.currentBody = GetComponent<PlanetEntity>();
 
         if (BodyManager.e)
         {
@@ -92,7 +96,7 @@ public class CelestialGravity : MonoBehaviour
                 Vector3 direction = transform.position - rb.position;
                 float rSqr = (direction).sqrMagnitude;
 
-                force = (gravitationalConstant * rb.mass * planetMass) / rSqr;
+                force = (gravitationalConstant * rb.mass * bodyMass) / rSqr;
 
                 if (rSqr < gravityRange * gravityRange)
                 {

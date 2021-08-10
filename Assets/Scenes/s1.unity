@@ -650,7 +650,7 @@ Transform:
   - {fileID: 269173336}
   - {fileID: 2127782395}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &95936938
 MonoBehaviour:
@@ -1647,7 +1647,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 454964, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 454964, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1683,7 +1683,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11431582, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
       propertyPath: mass
-      value: 622033.8
+      value: 3.3510238e+10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
@@ -3150,6 +3150,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7903b2d4ca3bca4e833a09cce97eb58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  worldLayer:
+    serializedVersion: 2
+    m_Bits: 0
   chunks:
   - {fileID: 195659084}
   - {fileID: 2012203995}
@@ -3160,11 +3163,13 @@ MonoBehaviour:
   translateForce: 100000
   jumpForce: 100000
   rotationForce: 40
-  currentPlanet: {fileID: 0}
+  currentBody: {fileID: 0}
   speedticle: {fileID: 1028491582}
+  rainParticles: {fileID: 0}
   curSectorX: 0
   curSectorY: 0
   sectorSize: 5000
+  rb: {fileID: 0}
   velocity: 0
   altitude: 0
   worldCamera: {fileID: 2059158207}
@@ -9793,7 +9798,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: ad1a9280e66476440906a15edf3b5e40, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: ad1a9280e66476440906a15edf3b5e40, type: 3}
       propertyPath: m_LocalScale.x
@@ -10360,7 +10365,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1222550241
 MonoBehaviour:
@@ -10557,7 +10562,7 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   generate: 1
   generateRings: 0
-  starPrefab: {fileID: 128662, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
+  starPrefab: {fileID: 175024, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
   planetPrefab: {fileID: 197542, guid: 82c5d72f47757414dbd26d3023f08577, type: 3}
   updateNames: 0
   namePrefixes:
@@ -12299,6 +12304,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 11441224, guid: 82c5d72f47757414dbd26d3023f08577, type: 3}
+      propertyPath: atmoSphereSphere
+      value: 
+      objectReference: {fileID: 1799065045}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 82c5d72f47757414dbd26d3023f08577, type: 3}
 --- !u!1 &1512152789
@@ -13394,6 +13403,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 374ec4f3f32b94942ad03a5ba3d4247f,
     type: 3}
   m_PrefabInstance: {fileID: 2129364013}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1799065045 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 486350, guid: 82c5d72f47757414dbd26d3023f08577,
+    type: 3}
+  m_PrefabInstance: {fileID: 1505334947}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1822536546
 GameObject:

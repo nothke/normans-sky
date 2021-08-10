@@ -159,14 +159,22 @@ public class Motion : MonoBehaviour
         altitude = 100000;
         Vector3 pos = transform.position;
 
-        altitude = !currentPlanet ? Mathf.Infinity :
-            Vector3.Distance(pos, currentPlanet.transform.position) - currentPlanet.radius;
 
-        airDensity = !currentPlanet ? 0 : 1 - (altitude / currentPlanet.atmosphereHeight);
+        altitude = !currentBody ? Mathf.Infinity :
+            Vector3.Distance(pos, currentBody.transform.position) - currentBody.radius;
+
+        Color atmosphereColor = Color.black;
+        {
+            PlanetEntity currentPlanet = currentBody as PlanetEntity; // TODO
+            airDensity = !currentPlanet ? 0 : 1 - (altitude / currentPlanet.atmosphereHeight);
+
+            if (currentPlanet)
+                atmosphereColor = currentPlanet.atmosphereColor;
+        }
 
         float forwardSpeed = Mathf.Max(0, localVelocity.z);
 
-        if (currentPlanet && currentPlanet.atmosphere && airDensity > 0 && velocity > 0)
+        if (currentBody && airDensity > 0 && velocity > 0)
         {
             aeroFactor = Vector3.Dot(transform.forward, rb.velocity.normalized);
             aeroFactor *= aeroFactor;
@@ -189,9 +197,9 @@ public class Motion : MonoBehaviour
             if (airDensity > 0)
             {
                 RenderSettings.fog = true;
-                RenderSettings.fogColor = currentPlanet.atmosphereColor;
+                RenderSettings.fogColor = atmosphereColor;
 
-                worldCamera.backgroundColor = Color.Lerp(Color.black, currentPlanet.atmosphereColor, airDensity);
+                worldCamera.backgroundColor = Color.Lerp(Color.black, atmosphereColor, airDensity);
                 RenderSettings.fogDensity = (airDensity * airDensity) / 100;
             }
             else
@@ -257,21 +265,18 @@ public class Motion : MonoBehaviour
             if (airDensity == 0)
                 rcsTarget = 1;
         }
-            ShipSystems.e.FireRCS(trnInput.z, trnInput.y, trnInput.x, rotInput.y, rotInput.x, rotInput.z);
+
+        //ShipSystems.e.FireRCS(trnInput.z, trnInput.y, trnInput.x, rotInput.y, rotInput.x, rotInput.z);
 
         if (forceInput.z != 0)
             mainEngineTarget = 1;
 
-            ShipSystems.e.SetMainEngineTargetPower(mainEngineThrottle);
+        //ShipSystems.e.SetMainEngineTargetPower(mainEngineThrottle);
 
-            if (Input.GetAxis("Forward") != 0)
-                mainEngineTarget = 1;
-
-            // engine audios
-            rcsAudio.volume = Mathf.SmoothDamp(rcsAudio.volume, rcsTarget, ref rcsAudioVelo, 0.1f);
-            mainEngineAudio.volume = Mathf.SmoothDamp(mainEngineAudio.volume, mainEngineTarget, ref mainEngineVelo, 0.1f);
-            hyperAudio.volume = Mathf.SmoothDamp(hyperAudio.volume, hyperTarget, ref hyperVelo, 0.1f);
-        }
+        // engine audios
+        rcsAudio.volume = Mathf.SmoothDamp(rcsAudio.volume, rcsTarget, ref rcsAudioVelo, 0.1f);
+        mainEngineAudio.volume = Mathf.SmoothDamp(mainEngineAudio.volume, mainEngineTarget, ref mainEngineVelo, 0.1f);
+        hyperAudio.volume = Mathf.SmoothDamp(hyperAudio.volume, hyperTarget, ref hyperVelo, 0.1f);
 
         if (airDensity < 0.5f)
             speedticle.SetEmissionRate(Mathf.Clamp(velocity - 40, 0, 200));
@@ -404,11 +409,15 @@ public class Motion : MonoBehaviour
             //GUILayout.Label("gravF:  " + currentBody.gravity.force.ToString("F2"), guiStyle);
             if (currentPlanet != null) GUILayout.Label("airDns: " + airDensity.ToString("F2"), guiStyle);
             GUILayout.Label("altitd: " + altitude.ToString("F2"), guiStyle);
+
+            /* TODO
             GUILayout.Label("distnc: " + Mathf.Sqrt(bodySqrDistance).ToString("F2"), guiStyle);
             GUILayout.Label("vSpeed: " + bodyVSpeed.ToString("F2"), guiStyle);
             GUILayout.Label("hSpeed: " + bodyHSpeed.ToString("F2"), guiStyle);
             float orbitHV = CelestialGravity.CalculateVelocityForCircularOrbit(1, bodySqrDistance); // TODO: change to earth masses
+            
             GUILayout.Label("orbitV: " + orbitHV.ToString("F2"), guiStyle);
+            */
 
             float surfGrav = CelestialGravity.GetAcceleration(currentBody.mass, currentBody.radius * currentBody.radius);
             GUILayout.Label("srfAcc: " + surfGrav.ToString("F2"), guiStyle);
