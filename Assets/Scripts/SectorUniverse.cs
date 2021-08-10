@@ -382,6 +382,8 @@ public class SectorUniverse : MonoBehaviour
                             planet.GetComponent<RingMaker>().enabled = true;
                 }
 
+                Debug.Assert(planet.painter, "Painter not assigned to planet entity");
+
                 planet.painter.rC1 = sector.planets[i].color;
                 planet.painter.rC2 = sector.planets[i].secondaryColor;
                 planet.painter.Paint();

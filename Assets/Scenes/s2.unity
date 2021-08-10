@@ -1500,7 +1500,7 @@ Transform:
   m_LocalScale: {x: 100, y: 100.00003, z: 100.00003}
   m_Children: []
   m_Father: {fileID: 1413012279}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &221458352
 MeshRenderer:
@@ -3071,11 +3071,6 @@ MonoBehaviour:
   rcsAudio: {fileID: 1452856438}
   mainEngineAudio: {fileID: 106592998}
   hyperAudio: {fileID: 1980629882}
-  rcsAudioVelo: 0
-  rcsAudioSmooth: 0
-  mainEngineVelo: 0
-  hyperVelo: 0
-  closeBodies: []
   trails:
   - {fileID: 42826939}
   - {fileID: 756035799}
@@ -3404,7 +3399,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &691838292
 Transform:
   m_ObjectHideFlags: 0
@@ -20208,27 +20203,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf0bc4230a10ac468cfeae0ca3f1246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  curSectorX: 3
-  curSectorY: 0
-  curSectorZ: 0
-  sectorSeparation: 50000
-  preview: 0
-  previewSectors: 1
-  previewSystems: 1
-  previewPlanets: 0
-  drawOrbits: 1
-  previewNames: 1
-  orbitColor: {r: 1, g: 1, b: 1, a: 1}
+  currentSector: {x: 0, y: 0, z: 0}
   sectorRadius: 2
-  systemProbability: 0.5
-  starPreviewRadius: 2000
-  planetPreviewRadius: 1000
-  skipZero: 1
+  sectorSeparation: 50000
   octaves: 3
   multiplier: 25
   amplitude: 1
   lacunarity: 2
   persistence: 0.9
+  systemProbability: 0.5
   maxPlanets: 3
   minPlanetRange: 2500
   minPlanetSeparation: 1500
@@ -20237,6 +20220,65 @@ MonoBehaviour:
   minPlanetRadius: 500
   maxPlanetRadius: 2000
   gasGiantThreshold: 1500
+  skipZero: 1
+  starColorGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  planetColorGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
   generate: 1
   generateRings: 1
   starPrefab: {fileID: 175024, guid: e2be1089f78cf79498a6551af539ee6f, type: 3}
@@ -20453,64 +20495,15 @@ MonoBehaviour:
   - ond
   - illon
   initOnStart: 0
-  starColorGradient:
-    serializedVersion: 2
-    key0: {r: 1, g: 1, b: 1, a: 1}
-    key1: {r: 1, g: 1, b: 1, a: 1}
-    key2: {r: 0, g: 0, b: 0, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 65535
-    ctime2: 0
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 2
-    m_NumAlphaKeys: 2
-  planetColorGradient:
-    serializedVersion: 2
-    key0: {r: 1, g: 1, b: 1, a: 1}
-    key1: {r: 1, g: 1, b: 1, a: 1}
-    key2: {r: 0, g: 0, b: 0, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 65535
-    ctime2: 0
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 2
-    m_NumAlphaKeys: 2
+  preview: 0
+  previewSectors: 1
+  previewSystems: 1
+  previewPlanets: 0
+  drawOrbits: 1
+  previewNames: 1
+  orbitColor: {r: 1, g: 1, b: 1, a: 1}
+  starPreviewRadius: 2000
+  planetPreviewRadius: 1000
 --- !u!114 &1222550244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23036,6 +23029,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 106114, guid: 8ad343a14d375204884b143d2500e614, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 119248, guid: 8ad343a14d375204884b143d2500e614, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}

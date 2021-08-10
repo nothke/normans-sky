@@ -141,6 +141,7 @@ MonoBehaviour:
   rain: 0
   thunder: 0
   snow: 0
+  painter: {fileID: 11433064}
 --- !u!114 &11457638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,11 +154,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49634b3966d48d54ba87ed63ce20788b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planetMass: 99946
+  bodyMass: 100000
   gravitationalConstant: 600
   gravityRange: 2000
   drawGizmos: 1
   force: 0
+  gravAt: 2449.4897
 --- !u!114 &11465738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -181,10 +183,9 @@ MonoBehaviour:
   minRings: 3
   maxRings: 50
   crossSegments: 64
-  startRadius: 1000
+  firstRadius: 1
   minRadius: 1
   maxRadius: 100
-  tube: {fileID: 0}
 --- !u!1 &131262
 GameObject:
   m_ObjectHideFlags: 0
