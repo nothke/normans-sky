@@ -3232,7 +3232,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 12800000, guid: 94c7d99393fbc59408e099e76b16843e, type: 3}
-    m_FontSize: 11
+    m_FontSize: 18
     m_FontStyle: 0
     m_Alignment: 0
     m_WordWrap: 0
