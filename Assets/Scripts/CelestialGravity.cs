@@ -40,7 +40,6 @@ public class CelestialGravity : MonoBehaviour
 
         gravAt = GetThresholdDistance(bodyMass);
 
-        //Gizmos.DrawWireSphere(transform.position, GetThresholdDistance(bodyMass));
         Gizmos.DrawWireSphere(transform.position, gravAt);
 
     }
@@ -69,26 +68,20 @@ public class CelestialGravity : MonoBehaviour
         return Mathf.Sqrt(k / forceThreshold);
     }
 
-    bool isIn;
-    bool wasIn;
-
     float RangeSqr { get { return gravAt * gravAt; } }
 
     void Update()
     {
-        if (!Motion.e)
+        if (Motion.e)
         {
-            enabled = false;
-            return;
+            Vector3 motionDiff = transform.position - Motion.e.transform.position;
+            if ((motionDiff).sqrMagnitude < gravityRange * gravityRange)
+                Motion.e.currentBody = GetComponent<PlanetEntity>();
         }
+    }
 
-        // check if ship is within range of this planet
-        Vector3 motionDir = transform.position - Motion.e.transform.position;
-
-        Vector3 motionDiff = transform.position - Motion.e.transform.position;
-        if ((motionDiff).sqrMagnitude < gravityRange * gravityRange)
-            Motion.e.currentBody = GetComponent<PlanetEntity>();
-
+    private void FixedUpdate()
+    {
         if (BodyManager.e)
         {
             foreach (Rigidbody rb in BodyManager.e.rigidbodies)
@@ -100,7 +93,7 @@ public class CelestialGravity : MonoBehaviour
 
                 if (rSqr < gravityRange * gravityRange)
                 {
-                    rb.AddForce(force * direction.normalized * Time.deltaTime);
+                    ApplyGravityForce(rb);
                 }
             }
         }
@@ -114,7 +107,7 @@ public class CelestialGravity : MonoBehaviour
         if (rSqr < RangeSqr)
         {
             force = GetAcceleration(bodyMass, rSqr);
-            rb.AddForce(force * direction.normalized * Time.deltaTime, ForceMode.Acceleration);
+            rb.AddForce(force * direction.normalized / 60, ForceMode.Acceleration);
         }
     }
 }

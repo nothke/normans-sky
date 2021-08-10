@@ -1733,7 +1733,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c891fbf2d912234b8569fe7f150c7c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: {x: 2000, y: 0, z: 0}
+  acceleration: {x: 37, y: 0, z: 0}
 --- !u!1 &1309022957 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1014253075864072, guid: be6ab751f98af584ead685e8546dac3d,
@@ -1752,7 +1752,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c891fbf2d912234b8569fe7f150c7c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: {x: 2000, y: 0, z: 0}
+  acceleration: {x: 37, y: 0, z: 0}
 --- !u!1 &1508011009
 GameObject:
   m_ObjectHideFlags: 0
@@ -1765,7 +1765,7 @@ GameObject:
   - component: {fileID: 1508011010}
   - component: {fileID: 1508011012}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: gravity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1784,6 +1784,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyMass: 100000
+  gravitationalConstant: 0.000006
+  gravityRange: 2000
   drawGizmos: 1
   force: 0
   gravAt: 2449.4897
@@ -2527,7 +2529,7 @@ GameObject:
   - component: {fileID: 1770757948}
   - component: {fileID: 1770757951}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: planet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2802,7 +2804,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c891fbf2d912234b8569fe7f150c7c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: {x: 2200, y: 0, z: 0}
+  acceleration: {x: 37, y: 0, z: 0}
 --- !u!54 &1873972258
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2976,6 +2978,7 @@ GameObject:
   - component: {fileID: 1940402606}
   - component: {fileID: 1940402605}
   - component: {fileID: 1940402607}
+  - component: {fileID: 1940402608}
   m_Layer: 0
   m_Name: GAME
   m_TagString: Untagged
@@ -3026,6 +3029,19 @@ MonoBehaviour:
   cam: {fileID: 1881558912}
   walkerCameraPivot: {fileID: 1088747371}
   ship: {fileID: 0}
+--- !u!114 &1940402608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1940402604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3b91df28c5eb104da2ba06b00a2c9f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rigidbodies: []
 --- !u!1001 &2066680906
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3117,7 +3133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c891fbf2d912234b8569fe7f150c7c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: {x: 2000, y: 0, z: 0}
+  acceleration: {x: 37, y: 0, z: 0}
 --- !u!4 &2112283626 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 07e89de974e26cb49972706f8707c7f3,

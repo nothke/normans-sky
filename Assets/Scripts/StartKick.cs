@@ -7,10 +7,6 @@ public class StartKick : MonoBehaviour {
     public Vector3 acceleration;
 
 	void Start () {
-        GetComponent<Rigidbody>().AddForce(acceleration, ForceMode.Acceleration);
-	}
-	
-	void Update () {
-		
+        GetComponent<Rigidbody>().velocity = acceleration;
 	}
 }
