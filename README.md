@@ -21,11 +21,13 @@ If you want to read about how I made the game, the technical details and the aft
 * Stars now have different colors depending on the temperature
 
 ### Versions and Branches
-There are currently 2 versions of the game:
-* v1 has the same features as the original jam version, You fly a single ship and explore a procgen universe. The only difference from the original version is that the code is improved and bugs fixed ([see above](#changes-to-the-original));
-* v2 is a messy, experimental WIP version which I was working on couple of years ago. It features a ship with an improved, more complex cockpit ("s2" scene), and also some art style trials, and experiments with an FPS controller for spacewalking ("walker" scene).
+There are currently 4 versions of the game:
+* Jam version is the original 10-hour version, only the build exists now on [itch](https://nothke.itch.io/normans-sky). As I didn't use git on the first couple of days, the source in the original 10 hour state doesn't exist any more
+* The post-Jam version is the version completed a few days after the jam, and it fixes some bugs, adds improvements a few more features. You can see the list of changes and the build of it on [itch](https://nothke.itch.io/normans-sky). The source of it is basically the first commit of this repo.
+* v1 has the same features as the post-jam version, You fly a single ship and explore a procgen universe. The difference from the previous version is that the code is refactored and more bugs are fixed ([see above](#changes-to-the-original)); Build of it will be available soon on [itch](https://nothke.itch.io/normans-sky)
+* v2 is a messy, experimental WIP version which I was working on couple of years ago. It features a ship with an improved, more complex cockpit ("s2" scene), and also some art style trials, and experiments with an FPS controller for spacewalking ("walker" scene)
 
 Branches reflect the versions:
 * [Master branch](https://github.com/nothke/normans-sky/tree/master) is the stable version of v1
-* [v1-2019](https://github.com/nothke/normans-sky/tree/v1-2019) is the current WIP branch of v1, based in Unity 2019
-* [v2-2019](https://github.com/nothke/normans-sky/tree/v2-2019) is the current v2 branch, based in Unity 2019
+* [v1-2019](https://github.com/nothke/normans-sky/tree/v1-2019) is the current WIP branch of v1, based in Unity 2019 LTS
+* [v2-2019](https://github.com/nothke/normans-sky/tree/v2-2019) is the current v2 branch, based in Unity 2019 LTS
