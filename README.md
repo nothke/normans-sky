@@ -13,6 +13,7 @@ The source code for Normans Sky, a game I made in 10 hours for lowrezjam 2016.
 If you want to read about how I made the game, the technical details and the aftermath of the game, [I wrote a postmortem blog post!](http://nothkedev.blogspot.com/2018/04/normans-sky-2-years-later-joke-made-in.html)
 
 ### Changes to the original
+v1 version:
 * This repo is a "fixed" version, with a lot of 10-hour shenanigans refactored
 * Endless universe creation fixed (in the original it was actually broken!)
 * Master branch has been updated to Unity 2019 LTS
@@ -22,10 +23,10 @@ If you want to read about how I made the game, the technical details and the aft
 
 ### Versions and Branches
 There are currently 4 versions of the game:
-* Jam version is the original 10-hour version, only the build exists now on [itch](https://nothke.itch.io/normans-sky). As I didn't use git on the first couple of days, the source in the original 10 hour state doesn't exist any more
-* The post-Jam version is the version completed a few days after the jam, and it fixes some bugs, adds improvements a few more features. You can see the list of changes and the build of it on [itch](https://nothke.itch.io/normans-sky). The source of it is basically the first commit of this repo.
-* v1 has the same features as the post-jam version, You fly a single ship and explore a procgen universe. The difference from the previous version is that the code is refactored and more bugs are fixed ([see above](#changes-to-the-original)); Build of it will be available soon on [itch](https://nothke.itch.io/normans-sky)
-* v2 is a messy, experimental WIP version which I was working on couple of years ago. It features a ship with an improved, more complex cockpit ("s2" scene), and also some art style trials, and experiments with an FPS controller for spacewalking ("walker" scene)
+* **Jam version** is the original 10-hour version, only the build exists now on [itch](https://nothke.itch.io/normans-sky). As I didn't use git on the first couple of days, the source in the original 10 hour state doesn't exist any more, and the version is no longer updated
+* The **post-Jam version** is the version completed a few days after the jam, and it fixes some bugs, adds improvements a few more features. You can see the list of changes and the build of it on [itch](https://nothke.itch.io/normans-sky). The source of it is basically the first commit of this repo. This version is no longer updated
+* **v1** has the same features as the post-jam version, You fly a single ship and explore a procgen universe. The difference from the previous version is that the code is refactored and more bugs are fixed, most importantly the endless universe now works ([see above for changes](#changes-to-the-original)); Build of it will be available soon on [itch](https://nothke.itch.io/normans-sky)
+* **v2** is a messy, experimental WIP version which I was working on couple of years ago. It features a ship with an improved, more complex cockpit ("s2" scene), and also some art style trials, and experiments with an FPS controller for spacewalking ("walker" scene)
 
 Branches reflect the versions:
 * [Master branch](https://github.com/nothke/normans-sky/tree/master) is the stable version of v1
