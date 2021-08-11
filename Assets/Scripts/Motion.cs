@@ -1,4 +1,4 @@
-﻿
+
 // if your project doesn't use these features, just comment out the defines:
 #define TimedTrailRenderer
 
@@ -12,6 +12,8 @@ public class Motion : MonoBehaviour
 {
     public static Motion e;
 
+    public LayerMask worldLayer;
+
     public List<Transform> chunks = new List<Transform>();
     public float shiftRange = 1000;
     public float translateForce = 100000;
@@ -21,9 +23,10 @@ public class Motion : MonoBehaviour
     private float originalAngularDrag;
     private float originalDrag;
 
-    public PlanetEntity currentPlanet;
+    public CelestialBody currentBody;
 
     public ParticleSystem speedticle;
+    public ParticleSystem rainParticles;
 
     public Vector3d curRealPosition;
     public Vector3d originOffset;
@@ -34,7 +37,7 @@ public class Motion : MonoBehaviour
 
     void Awake() { e = this; }
 
-    Rigidbody rb;
+    [System.NonSerialized] public Rigidbody rb;
 
     public float velocity;
     public float altitude;
@@ -133,16 +136,40 @@ public class Motion : MonoBehaviour
         velocity = rb.velocity.magnitude;
         Vector3 localVelocity = transform.InverseTransformDirection(rb.velocity);
 
+        // Proximity sensor
+        /*
+        if (CockpitMenu.e)
+        {
+            Ray proxRay = new Ray(transform.position, rb.velocity);
+
+            Debug.DrawRay(proxRay.origin, rb.velocity);
+
+            if (velocity > 10 && Physics.Raycast(proxRay, velocity * 2, worldLayer))
+            {
+                CockpitMenu.e.DisplayWarning("PROX");
+            }
+            else CockpitMenu.e.EndWarning("PROX");
+        }*/
+
+        altitude = 100000;
         Vector3 pos = transform.position;
 
-        altitude = !currentPlanet ? Mathf.Infinity :
-            Vector3.Distance(pos, currentPlanet.transform.position) - currentPlanet.radius;
 
-        airDensity = !currentPlanet ? 0 : 1 - (altitude / currentPlanet.atmosphereHeight);
+        altitude = !currentBody ? Mathf.Infinity :
+            Vector3.Distance(pos, currentBody.transform.position) - currentBody.radius;
+
+        Color atmosphereColor = Color.black;
+        {
+            PlanetEntity currentPlanet = currentBody as PlanetEntity; // TODO
+            airDensity = !currentPlanet ? 0 : 1 - (altitude / currentPlanet.atmosphereHeight);
+
+            if (currentPlanet)
+                atmosphereColor = currentPlanet.atmosphereColor;
+        }
 
         float forwardSpeed = Mathf.Max(0, localVelocity.z);
 
-        if (currentPlanet && currentPlanet.atmosphere && airDensity > 0 && velocity > 0)
+        if (currentBody && airDensity > 0 && velocity > 0)
         {
             aeroFactor = Vector3.Dot(transform.forward, rb.velocity.normalized);
             aeroFactor *= aeroFactor;
@@ -165,9 +192,9 @@ public class Motion : MonoBehaviour
             if (airDensity > 0)
             {
                 RenderSettings.fog = true;
-                RenderSettings.fogColor = currentPlanet.atmosphereColor;
+                RenderSettings.fogColor = atmosphereColor;
 
-                worldCamera.backgroundColor = Color.Lerp(Color.black, currentPlanet.atmosphereColor, airDensity);
+                worldCamera.backgroundColor = Color.Lerp(Color.black, atmosphereColor, airDensity);
                 RenderSettings.fogDensity = (airDensity * airDensity) / 100;
             }
             else
@@ -237,6 +264,7 @@ public class Motion : MonoBehaviour
         if (forceInput.z != 0)
             mainEngineTarget = 1;
 
+        // engine audios
         rcsAudio.volume = Mathf.SmoothDamp(rcsAudio.volume, rcsTarget, ref rcsAudioVelo, 0.1f);
         mainEngineAudio.volume = Mathf.SmoothDamp(mainEngineAudio.volume, mainEngineTarget, ref mainEngineVelo, 0.1f);
         hyperAudio.volume = Mathf.SmoothDamp(hyperAudio.volume, hyperTarget, ref hyperVelo, 0.1f);
@@ -348,18 +376,42 @@ public class Motion : MonoBehaviour
 
         GUILayout.Space(5);
 
-        if (currentPlanet)
+        if (currentBody)
         {
-            GUILayout.Label("Body: " + currentPlanet.name, guiStyle);
+            GUILayout.Label("Body: " + currentBody.name, guiStyle);
+
+            PlanetEntity currentPlanet = currentBody as PlanetEntity;
+
+            if (currentPlanet != null)
+            {
+                string type = currentPlanet.type == PlanetEntity.Type.Rocky ? "Rocky Planet" : "Gas Giant";
+                GUILayout.Label("Type: " + type, guiStyle);
+            }
+            else
+            {
+                GUILayout.Label("Type: Star", guiStyle);
+            }
 
             //string type = currentPlanet
             //GUILayout.Label("Type: " + currentPlanet.name, guiStyle);
 
+            GUILayout.Label("radius: " + currentBody.radius, guiStyle);
+            if (currentPlanet != null) GUILayout.Label("atmosH: " + currentPlanet.atmosphereHeight.ToString("F2"), guiStyle);
+            //GUILayout.Label("gravF:  " + currentBody.gravity.force.ToString("F2"), guiStyle);
+            if (currentPlanet != null) GUILayout.Label("airDns: " + airDensity.ToString("F2"), guiStyle);
+            GUILayout.Label("altitd: " + altitude.ToString("F2"), guiStyle);
 
-            GUILayout.Label("radius: " + currentPlanet.radius, guiStyle);
-            GUILayout.Label("atmosH: " + currentPlanet.atmosphereHeight, guiStyle);
-            GUILayout.Label("gravF:  " + currentPlanet.gravity.force.ToString("F2"), guiStyle);
-            GUILayout.Label("airDns: " + airDensity.ToString("F2"), guiStyle);
+            /* TODO
+            GUILayout.Label("distnc: " + Mathf.Sqrt(bodySqrDistance).ToString("F2"), guiStyle);
+            GUILayout.Label("vSpeed: " + bodyVSpeed.ToString("F2"), guiStyle);
+            GUILayout.Label("hSpeed: " + bodyHSpeed.ToString("F2"), guiStyle);
+            float orbitHV = CelestialGravity.CalculateVelocityForCircularOrbit(1, bodySqrDistance); // TODO: change to earth masses
+            
+            GUILayout.Label("orbitV: " + orbitHV.ToString("F2"), guiStyle);
+            */
+
+            float surfGrav = CelestialGravity.GetAcceleration(currentBody.mass, currentBody.radius * currentBody.radius);
+            GUILayout.Label("srfAcc: " + surfGrav.ToString("F2"), guiStyle);
         }
         else
             GUILayout.Label("Body: None in range", guiStyle);

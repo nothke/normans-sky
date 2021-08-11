@@ -3150,6 +3150,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7903b2d4ca3bca4e833a09cce97eb58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  worldLayer:
+    serializedVersion: 2
+    m_Bits: 0
   chunks:
   - {fileID: 195659084}
   - {fileID: 2012203995}
@@ -3160,8 +3163,9 @@ MonoBehaviour:
   translateForce: 100000
   jumpForce: 100000
   rotationForce: 40
-  currentPlanet: {fileID: 0}
+  currentBody: {fileID: 0}
   speedticle: {fileID: 1028491582}
+  rainParticles: {fileID: 0}
   curSectorX: 0
   curSectorY: 0
   sectorSize: 5000
@@ -3330,7 +3334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd5b1d953d1782e44864b7f45aba221a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  force: {x: 0, y: 0, z: -2000}
+  velocity: {x: 0, y: 0, z: 0}
 --- !u!1 &612121158
 GameObject:
   m_ObjectHideFlags: 0
@@ -12298,6 +12302,10 @@ PrefabInstance:
     - target: {fileID: 444594, guid: 82c5d72f47757414dbd26d3023f08577, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11412982, guid: 82c5d72f47757414dbd26d3023f08577, type: 3}
+      propertyPath: drawGizmos
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 82c5d72f47757414dbd26d3023f08577, type: 3}

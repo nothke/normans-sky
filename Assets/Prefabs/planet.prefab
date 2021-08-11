@@ -230,8 +230,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49634b3966d48d54ba87ed63ce20788b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planetMass: 100000
+  bodyMass: 100000
   gravitationalConstant: 600
   gravityRange: 2000
   drawGizmos: 0
   force: 0
+  gravAt: 2449.4897

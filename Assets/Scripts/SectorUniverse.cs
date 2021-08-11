@@ -344,11 +344,15 @@ public class SectorUniverse : MonoBehaviour
             sector.star = new StarEntity[1];
 
         sector.star[0] = starGO.GetComponent<StarEntity>();
+        Debug.Assert(sector.star[0] != null, "StarEntity component not on star");
 
         StarEntity star = sector.star[0];
 
+
         if (sector.planets.Count > 0)
         {
+            Debug.Assert(star.planets != null, "Planets are null");
+
             if (star.planets == null)
                 star.planets = new List<PlanetEntity>(maxPlanets);
 
@@ -377,6 +381,8 @@ public class SectorUniverse : MonoBehaviour
                         if (Random.value < 0.5f)
                             planet.GetComponent<RingMaker>().enabled = true;
                 }
+
+                Debug.Assert(planet.painter, "Painter not assigned to planet entity");
 
                 planet.painter.rC1 = sector.planets[i].color;
                 planet.painter.rC2 = sector.planets[i].secondaryColor;
