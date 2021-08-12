@@ -2,6 +2,8 @@
 using System.Collections;
 using UnityEngine.UI;
 
+using UnityEngine.InputSystem;
+
 public class TogglePixelate : MonoBehaviour
 {
     public GameObject letterBoxL;
@@ -10,7 +12,9 @@ public class TogglePixelate : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.L))
+        if (Keyboard.current.ctrlKey.isPressed && 
+            Keyboard.current.altKey.isPressed && 
+            Keyboard.current.lKey.wasPressedThisFrame)
             Toggle();
     }
 

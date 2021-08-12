@@ -6,6 +6,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+
 using SkyUtils;
 
 public class Motion : MonoBehaviour
@@ -62,6 +66,10 @@ public class Motion : MonoBehaviour
     bool hyperInput;
     bool brakeInput;
 
+    public NSInput input;
+
+
+
     public static void AddChunk(Transform chunk)
     {
         if (e)
@@ -76,6 +84,9 @@ public class Motion : MonoBehaviour
 
     void Start()
     {
+        input = new NSInput();
+        input.Enable();
+
         ShiftOrigin();
 
         originalAngularDrag = GetComponent<Rigidbody>().angularDrag;
@@ -117,6 +128,17 @@ public class Motion : MonoBehaviour
 
     private void Update()
     {
+#if ENABLE_INPUT_SYSTEM
+        forceInput = new Vector3(
+            input.Flight.Sideways.ReadValue<float>(),
+            input.Flight.Vertical.ReadValue<float>(),
+            input.Flight.Forward.ReadValue<float>());
+
+        torqueInput = new Vector3(
+            input.Flight.Pitch.ReadValue<float>(),
+            input.Flight.Yaw.ReadValue<float>(),
+            input.Flight.Roll.ReadValue<float>());
+#else
         forceInput = new Vector3(
             Input.GetAxis("Horizontal"),
             Input.GetAxis("Vertical"),
@@ -129,6 +151,7 @@ public class Motion : MonoBehaviour
 
         hyperInput = Input.GetKey(KeyCode.LeftControl);
         brakeInput = Input.GetKey(KeyCode.Space);
+#endif
     }
 
     void FixedUpdate()

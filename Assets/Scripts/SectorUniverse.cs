@@ -630,8 +630,8 @@ public class SectorUniverse : MonoBehaviour
 #if UNITY_EDITOR
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.U))
-            Move(0, 1, 0, true);
+        //if (Input.GetKeyDown(KeyCode.U))
+            //Move(0, 1, 0, true);
     }
 #endif
 }
